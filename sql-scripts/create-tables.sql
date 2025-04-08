@@ -32,7 +32,9 @@ CREATE TABLE Customer (
     id NUMBER(12, 0) PRIMARY KEY,
     name VARCHAR2(30) NOT NULL,
     phone VARCHAR2(15),
-    email VARCHAR2(100)
+    email VARCHAR2(100),
+    total_points NUMBER(5),
+    available_points NUMBER(5)
 );
 
 -- Create table Employee

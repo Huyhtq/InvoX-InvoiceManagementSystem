@@ -8,6 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Customer {
     @Id
     private Long id;
@@ -15,4 +16,10 @@ public class Customer {
     private String name;
     private String phone;
     private String email;
+    
+    @Column(name = "total_points")
+    private Integer totalPoints;
+
+    @Column(name = "available_points")
+    private Integer availablePoints;
 }

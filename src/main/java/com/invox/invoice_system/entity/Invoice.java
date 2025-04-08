@@ -10,6 +10,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Invoice {
     @Id
     private Long id;
@@ -22,6 +23,7 @@ public class Invoice {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
+    @Column(name = "created_date")
     @Temporal(TemporalType.DATE)
     private Date date;
 

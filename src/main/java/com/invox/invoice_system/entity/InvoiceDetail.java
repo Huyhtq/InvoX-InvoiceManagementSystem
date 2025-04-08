@@ -8,6 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class InvoiceDetail {
     @Id
     private Long id;
@@ -21,5 +22,6 @@ public class InvoiceDetail {
     private Product product;
 
     private Integer quantity;
+    @Column(name = "unit_price")
     private Long unitPrice;
 }

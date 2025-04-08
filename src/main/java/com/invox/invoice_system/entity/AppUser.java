@@ -8,11 +8,16 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AppUser {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
+    @Column(nullable = false, length = 30)
     private String username;
+
+    @Column(nullable = false, length = 100)
     private String password;
 
     @ManyToOne
@@ -22,4 +27,5 @@ public class AppUser {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+    
 }

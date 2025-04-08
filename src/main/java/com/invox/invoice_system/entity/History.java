@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class History {
     @Id
     private Long id;
