@@ -39,6 +39,7 @@ html {
   color: #2563eb;
   width: 50px;
   height: 50px;
+  margin-bottom: -5px;
 }
 
 .logo-text {
