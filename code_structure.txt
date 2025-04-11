@@ -1,0 +1,50 @@
+CẤU TRÚC DỰ ÁN HỆ THỐNG QUẢN LÝ HÓA ĐƠN
+
+1. sql-scripts/
+   - Chứa các file SQL dùng để chạy trong Oracle Database.
+   - Bao gồm: script tạo bảng, thêm dữ liệu mẫu, tạo sequence, trigger, constraint,...
+   - Có thể dùng để khởi tạo hoặc reset database.
+
+2. src/main/
+
+   ├── java/com/invox/invoice/
+   │
+   │   ├── controller/
+   │   │   - Chứa các API điều khiển của hệ thống.
+   │   │   - Ví dụ: thêm hóa đơn, lấy danh sách sản phẩm, xuất báo cáo,...
+   │
+   │   ├── dto/
+   │   │   - Lưu các lớp DTO (Data Transfer Object).
+   │   │   - Dùng để truyền dữ liệu giữa frontend ⇄ backend mà không lộ thông tin.
+   │
+   │   ├── entity/
+   │   │   - Chứa các class ánh xạ với bảng trong cơ sở dữ liệu.
+   │   │   - Mỗi entity tương ứng 1 bảng (Product, Invoice, Customer,...).
+   │
+   │   ├── repository/
+   │   │   - Chứa các interface truy vấn dữ liệu.
+   │   │   - Mở rộng JpaRepository để tự động tạo các truy vấn cơ bản.
+   │
+   │   ├── service/
+   │   │   - Định nghĩa các interface chứa logic xử lý nghiệp vụ.
+   │   │   - Ví dụ: tạo hóa đơn, tính tổng doanh thu, tìm sản phẩm bán chạy,...
+   │
+   │   └── serviceimpl/
+   │       - Chứa các class triển khai logic nghiệp vụ từ service interface.
+   │       - Là nơi xử lý chính các thao tác backend.
+   │
+
+   └── resources/
+       - Chứa các tài nguyên và file cấu hình của Spring Boot.
+
+       ├── application.properties / application.yml
+       │   - File cấu hình ứng dụng (port, kết nối DB, bảo mật,...)
+
+       ├── static/
+       │   - Chứa HTML, CSS, JavaScript, Bootstrap nếu có dùng frontend nhúng.
+
+       ├── templates/
+       │   - Dùng nếu hệ thống render HTML phía server với Thymeleaf.
+
+       └── public/
+           - Chứa tài nguyên tĩnh có thể truy cập trực tiếp từ trình duyệt.
