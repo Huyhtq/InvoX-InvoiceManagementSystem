@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -55,6 +56,14 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
+
+    @Override
+    public List<ProductResponseDTO> searchProductsByName(String keyword) {
+    return productRepository.findByNameContainingIgnoreCase(keyword)
+            .stream()
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
+}
 
     private ProductResponseDTO mapToDTO(Product product) {
         return new ProductResponseDTO(
