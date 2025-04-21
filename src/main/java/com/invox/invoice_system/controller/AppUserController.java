@@ -6,6 +6,7 @@ import com.invox.invoice_system.dto.AppUserLoginDTO;
 import com.invox.invoice_system.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,8 @@ public class AppUserController {
     @Autowired
     private AppUserService appUserService;
 
-    @PostMapping
+    @PreAuthorize("hasRole('OWNER')")
+    @PostMapping("/api/users/create")
     public ResponseEntity<AppUserResponseDTO> createUser(@RequestBody AppUserRequestDTO dto) {
         return ResponseEntity.ok(appUserService.createUser(dto));
     }

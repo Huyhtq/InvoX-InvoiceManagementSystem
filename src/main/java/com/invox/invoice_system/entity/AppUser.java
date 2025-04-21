@@ -27,5 +27,11 @@ public class AppUser {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
-    
+
+    @Column(name = "access_level") // thêm trường này
+    private Integer accessLevel;
+
+    public Integer getAccessLevel() {
+        return this.accessLevel;
+    }
 }
