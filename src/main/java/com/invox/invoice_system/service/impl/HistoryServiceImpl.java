@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.sql.Timestamp;
 
 @Service
 public class HistoryServiceImpl implements HistoryService {
@@ -47,6 +49,30 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     public void deleteHistory(Long id) {
         historyRepository.deleteById(id);
+    }
+
+    @Override
+    public List<HistoryResponseDTO> getHistoriesBetween(Timestamp from, Timestamp to) {
+        return historyRepository.findByTimestampBetween(from, to)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<HistoryResponseDTO> getHistoriesAfter(Timestamp from) {
+        return historyRepository.findByTimestampAfter(from)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<HistoryResponseDTO> getHistoriesBefore(Timestamp to) {
+        return historyRepository.findByTimestampBefore(to)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     private HistoryResponseDTO mapToDTO(History history) {
