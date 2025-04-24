@@ -24,7 +24,7 @@ CREATE TABLE Product (
     quantity NUMBER(6),
     category_id NUMBER(3, 0),
     brand VARCHAR2(50),
-    FOREIGN KEY (category_id) REFERENCES Category(id)
+    CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES Category(id)
 );
 
 -- Create table Customer
@@ -57,8 +57,9 @@ CREATE TABLE AppUser (
     password VARCHAR2(100) NOT NULL,
     employee_id NUMBER(12, 0),
     role_id NUMBER(3, 0),
-    FOREIGN KEY (employee_id) REFERENCES Employee(id),
-    FOREIGN KEY (role_id) REFERENCES Role(id)
+    access_level NUMBER(2,0),
+    CONSTRAINT fk_appuser_employee FOREIGN KEY (employee_id) REFERENCES Employee(id),
+    CONSTRAINT fk_appuser_role FOREIGN KEY (role_id) REFERENCES Role(id)
 );
 
 -- Create table Invoice
@@ -68,8 +69,8 @@ CREATE TABLE Invoice (
     employee_id NUMBER(12, 0),
     created_date DATE NOT NULL,
     total NUMBER(14, 0),
-    FOREIGN KEY (customer_id) REFERENCES Customer(id),
-    FOREIGN KEY (employee_id) REFERENCES Employee(id)
+    CONSTRAINT fk_invoice_customer FOREIGN KEY (customer_id) REFERENCES Customer(id),
+    CONSTRAINT fk_invoice_employee FOREIGN KEY (employee_id) REFERENCES Employee(id)
 );
 
 -- Create table InvoiceDetail
@@ -79,8 +80,8 @@ CREATE TABLE InvoiceDetail (
     product_id NUMBER(5, 0),
     quantity NUMBER(6, 0) NOT NULL,
     unit_price NUMBER(12, 0) NOT NULL,
-    FOREIGN KEY (invoice_id) REFERENCES Invoice(id),
-    FOREIGN KEY (product_id) REFERENCES Product(id)
+    CONSTRAINT fk_invoicedetail_invoice FOREIGN KEY (invoice_id) REFERENCES Invoice(id),
+    CONSTRAINT fk_invoicedetail_product FOREIGN KEY (product_id) REFERENCES Product(id)
 );
 
 -- Create table History
@@ -92,5 +93,5 @@ CREATE TABLE History (
     target_id NUMBER(12, 0),
     timestamp TIMESTAMP NOT NULL,
     --detail_json CLOB,  -- Optional, store JSON data if needed
-    FOREIGN KEY (user_id) REFERENCES AppUser(id)
+    CONSTRAINT fk_history_user FOREIGN KEY (user_id) REFERENCES AppUser(id)
 );

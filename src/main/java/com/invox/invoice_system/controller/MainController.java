@@ -21,6 +21,11 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "redirect:/invox/loginPage";
+    }
+    
     @GetMapping("/loginPage")
     public String loginPage(){
         return "login";

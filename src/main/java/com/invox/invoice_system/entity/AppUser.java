@@ -28,10 +28,6 @@ public class AppUser {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @Column(name = "access_level") // thêm trường này
+    @Column(name = "access_level") 
     private Integer accessLevel;
-
-    public Integer getAccessLevel() {
-        return this.accessLevel;
-    }
 }
