@@ -1,0 +1,10 @@
+/* system.css */
+
+body {
+    font-family: "Segoe UI", sans-serif;
+}
+
+.nav-link.active {
+    font-weight: bold;
+    color: #0d6efd;
+}
