@@ -1,0 +1,123 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>InvoX</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/login.css}" />
+  <link rel="stylesheet" th:href="@{/css/header.css}" />
+ </head>
+ <body>
+  <header class="d-flex align-items-center justify-content-between px-3 header-bar">
+   <div class="d-flex align-items-center gap-2">
+    <img alt="Icon of a document with lines representing text" height="24" src="/images/invoice.webp" width="24"/>
+    <span class="fw-bold fs-5 m-0 user-select-none">InvoX</span>
+   </div>
+   <div class="d-flex align-items-center gap-3 employee-info">
+    <div class="d-flex align-items-center gap-1">
+     <i class="fas fa-sign-in-alt"></i>
+     <span>Employee Name</span>
+     <span>ID:......</span>
+    </div>
+    <div class="camera-icon d-flex align-items-center justify-content-center">
+     <img alt="Camera icon inside a white rounded square" src="/images/avatar.png"/>
+    </div>
+   </div>
+  </header>
+  <div class="d-flex">
+   <nav class="sidebar d-flex flex-column justify-content-between p-2" style="width: 12rem;">
+    <ul class="nav flex-column mt-3">
+     <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-2" href="#" th:classappend="${activePage == 'dashboard'} ? ' active' : ''">
+       <i class="fas fa-home" style="width: 20px;"></i>
+       <span class="user-select-none">Dashboard</span>
+      </a>
+     </li>
+     <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-2 active" href="#" th:classappend="${activePage == 'invoices'} ? ' active' : ''">
+       <i class="fas fa-file-alt" style="width: 20px;"></i>
+       <span>Invoices</span>
+      </a>
+     </li>
+     <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-2" href="#" th:classappend="${activePage == 'customers'} ? ' active' : ''">
+       <i class="fas fa-users" style="width: 20px;"></i>
+       <span class="user-select-none">Customers</span>
+      </a>
+     </li>
+     <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-2" href="#" th:classappend="${activePage == 'products'} ? ' active' : ''">
+       <i class="fas fa-cube" style="width: 20px;"></i>
+       <span class="user-select-none">Products</span>
+      </a>
+     </li>
+     <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-2" href="#" th:classappend="${activePage == 'history'} ? ' active' : ''">
+       <i class="fas fa-history" style="width: 20px;"></i>
+       <span class="user-select-none">History</span>
+      </a>
+     </li>
+     <li class="nav-item">
+      <a class="nav-link d-flex align-items-center gap-2" href="#" th:classappend="${activePage == 'report'} ? ' active' : ''">
+       <i class="fas fa-chart-line" style="width: 20px;"></i>
+       <span class="user-select-none">Report</span>
+      </a>
+     </li>
+    </ul>
+    <div class="text-center footer-text mb-2">Company Name</div>
+   </nav>
+   <main class="flex-grow-1 p-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3">
+     <h2 class="fw-semibold mb-3 mb-sm-0 user-select-none">Invoices</h2>
+     <button class="btn btn-primary btn-sm" type="button">+ New Invoice</button>
+    </div>
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-2 mb-3">
+     <input class="form-control form-control-sm flex-grow-1" placeholder="Search invoices..." type="text" th:value="${searchTerm}"/>
+     <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" type="button">
+      <i class="fas fa-filter" style="font-size: 0.75rem;"></i>
+      <span>All Status</span>
+     </button>
+    </div>
+    <table class="table table-bordered text-nowrap align-middle">
+     <thead class="bg-white text-secondary">
+      <tr>
+       <th scope="col">Invoice #</th>
+       <th scope="col">Date</th>
+       <th scope="col">Amount</th>
+       <th scope="col">Status</th>
+       <th scope="col">Actions</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr th:each="invoice : ${invoices}">
+       <td th:text="${invoice.number}">INV001</td>
+       <td th:text="${invoice.date}">1/2/2024</td>
+       <td th:text="${invoice.amount}">150,000 VND</td>
+       <td>
+        <span th:classappend="${invoice.status == 'paid'} ? 'status-paid' : 'status-unpaid'" th:text="${invoice.status}">paid</span>
+       </td>
+       <td class="text-secondary">
+        <button class="btn btn-link p-0 text-secondary" type="button" th:aria-label="'Edit invoice ' + ${invoice.number}">
+         <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button class="btn btn-link p-0 text-secondary ms-2" type="button" th:aria-label="'Delete invoice ' + ${invoice.number}">
+         <i class="fas fa-trash"></i>
+        </button>
+        <button class="btn btn-link p-0 text-secondary ms-2" type="button" th:aria-label="'Print invoice ' + ${invoice.number}">
+         <i class="fas fa-print"></i>
+        </button>
+       </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(invoices)}">
+       <td colspan="5" class="text-center text-muted">No invoices found.</td>
+      </tr>
+     </tbody>
+    </table>
+    <div class="text-center footer-text mt-5">InvoX - Group 5</div>
+   </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+  </script>
+ </body>
+</html>
