@@ -1,0 +1,39 @@
+package com.invox.invoice_system.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Entity
+@Table(name = "InvoiceDetail")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class InvoiceDetail {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @Column(name = "id")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoice_id", nullable = false)
+    private Invoice invoice;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @Column(name = "quantity", nullable = false)
+    private Long quantity;
+
+    @Column(name = "unit_price", nullable = false)
+    private Double unitPrice; // Giá bán của sản phẩm tại thời điểm bán (snapshot)
+
+    @Column(name = "product_name_snapshot", nullable = false, length = 100)
+    private String productNameSnapshot; // Tên sản phẩm tại thời điểm bán (snapshot)
+
+    @Column(name = "sub_total", nullable = false)
+    private Double subTotal; // Thành tiền cho dòng này (quantity * unitPrice)
+}
