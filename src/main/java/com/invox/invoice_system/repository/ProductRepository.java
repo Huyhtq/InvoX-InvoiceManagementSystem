@@ -25,4 +25,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Tìm sản phẩm có số lượng tồn kho dưới một ngưỡng nhất định (ví dụ: để đặt hàng lại)
     List<Product> findByQuantityLessThan(Long quantity);
+
+    //
+    List<Product> findByCategory_IdAndStatus(Long categoryId, ProductStatus status);
 }

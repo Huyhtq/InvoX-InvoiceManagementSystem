@@ -27,6 +27,12 @@ public interface ProductMapper {
     @Mapping(target = "invoiceDetails", ignore = true) // Ignore collections not handled here
     Product toEntity(ProductRequestDTO productRequestDTO);
 
+    @Mapping(source = "category.id", target = "category.id") 
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "invoiceDetails", ignore = true) 
+    Product toEntity(ProductResponseDTO productResponseDTO); 
+
     // Helper method to map Category ID to Category entity if needed elsewhere
     default Category toCategoryEntity(Long categoryId) {
         if (categoryId == null) {
