@@ -1,11 +1,13 @@
 package com.invox.invoice_system.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class RoleDTO {
-    private Integer id;
+    private Long id;
     private String name;
 }

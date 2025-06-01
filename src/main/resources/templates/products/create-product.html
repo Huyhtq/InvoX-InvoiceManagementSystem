@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="layout :: layout">
+        <div th:fragment="content">
+            <div class="container-fluid p-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 th:text="${product.id != null} ? 'Chỉnh sửa Sản phẩm' : 'Thêm Sản phẩm mới'">Thêm Sản phẩm mới</h2>
+                        <p class="text-muted">Nhập thông tin chi tiết cho sản phẩm của bạn</p>
+                    </div>
+                </div>
+
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <span th:text="${error}"></span>
+                </div>
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <span th:text="${successMessage}"></span>
+                </div>
+
+                <div class="card p-4 shadow-sm">
+                    <form th:action="@{${product.id != null} ? '/products/edit/' + ${product.id} : '/products/new'}" th:object="${product}" method="post" id="productForm">
+                        <div class="row">
+                            <div class="col-md-7 mb-3"> <label for="nameInput" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nameInput" th:field="*{name}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                            </div>
+                            <div class="col-md-5 mb-3"> <label for="skuInput" class="form-label">SKU <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="skuInput" th:field="*{sku}" required>
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('sku')}" th:errors="*{sku}"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="priceInput" class="form-label">Giá bán (VNĐ)</label>
+                                <input type="number" class="form-control" id="priceInput" th:field="*{price}" min="0" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="costPriceInput" class="form-label">Giá nhập (VNĐ)</label>
+                                <input type="number" class="form-control" id="costPriceInput" th:field="*{costPrice}" min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="quantityInput" class="form-label">Số lượng tồn kho</label>
+                                <input type="number" class="form-control" id="quantityInput" th:field="*{quantity}" min="0" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="categorySelect" class="form-label">Danh mục</label>
+                                <select class="form-select" id="categorySelect" th:field="*{categoryId}" required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}"
+                                            th:selected="${product.categoryId == category.id}">
+                                        Electronics
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="brandInput" class="form-label">Thương hiệu</label>
+                                <input type="text" class="form-control" id="brandInput" th:field="*{brand}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="imageUrlInput" class="form-label">URL Hình ảnh</label>
+                                <input type="url" class="form-control" id="imageUrlInput" th:field="*{imageUrl}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descriptionTextarea" class="form-label">Mô tả sản phẩm</label>
+                            <textarea class="form-control" id="descriptionTextarea" th:field="*{description}" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="statusSelect" class="form-label">Trạng thái sản phẩm</label>
+                            <select class="form-select" id="statusSelect" th:field="*{status}" required>
+                                <option th:each="statusOption : ${productStatuses}"
+                                        th:value="${statusOption}"
+                                        th:text="${statusOption.displayName}"
+                                        th:selected="${product.status == statusOption}">
+                                    ACTIVE
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary me-2">Lưu</button>
+                        <a th:href="@{/products}" class="btn btn-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div th:fragment="scripts">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js"></script>
+            <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
+            <script type="text/javascript" th:src="@{/js/products.js}"></script> 
+            </div>
+    </div>
+</html>

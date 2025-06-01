@@ -1,88 +1,65 @@
 package com.invox.invoice_system.service.impl;
 
-import com.invox.invoice_system.dto.HistoryRequestDTO;
 import com.invox.invoice_system.dto.HistoryResponseDTO;
+import com.invox.invoice_system.entity.AppUser;
 import com.invox.invoice_system.entity.History;
-import com.invox.invoice_system.repository.AppUserRepository;
+import com.invox.invoice_system.enums.HistoryAction;
+import com.invox.invoice_system.mapper.HistoryMapper;
 import com.invox.invoice_system.repository.HistoryRepository;
 import com.invox.invoice_system.service.HistoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.sql.Timestamp;
 
 @Service
+@RequiredArgsConstructor
 public class HistoryServiceImpl implements HistoryService {
 
-    @Autowired
-    private HistoryRepository historyRepository;
-
-    @Autowired
-    private AppUserRepository userRepository;
+    private final HistoryRepository historyRepository;
+    private final HistoryMapper historyMapper;
 
     @Override
-    public HistoryResponseDTO createHistory(HistoryRequestDTO dto) {
-        History history = History.builder()
-                .id(dto.getId())
-                .user(userRepository.findById(dto.getUserId()).orElseThrow())
-                .action(dto.getAction())
-                .targetType(dto.getTargetType())
-                .targetId(dto.getTargetId())
-                .timestamp(dto.getTimestamp())
-                .build();
-
-        return mapToDTO(historyRepository.save(history));
-    }
-
-    @Override
-    public List<HistoryResponseDTO> getAllHistories() {
-        return historyRepository.findAll().stream().map(this::mapToDTO).toList();
-    }
-
-    @Override
-    public HistoryResponseDTO getHistoryById(Long id) {
-        return historyRepository.findById(id).map(this::mapToDTO).orElseThrow();
-    }
-
-    @Override
-    public void deleteHistory(Long id) {
-        historyRepository.deleteById(id);
-    }
-
-    @Override
-    public List<HistoryResponseDTO> getHistoriesBetween(Timestamp from, Timestamp to) {
-        return historyRepository.findByTimestampBetween(from, to)
-                .stream()
-                .map(this::mapToDTO)
+    @Transactional(readOnly = true)
+    public List<HistoryResponseDTO> getAllHistoryRecords() {
+        return historyRepository.findAll().stream()
+                .map(historyMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<HistoryResponseDTO> getHistoriesAfter(Timestamp from) {
-        return historyRepository.findByTimestampAfter(from)
-                .stream()
-                .map(this::mapToDTO)
+    @Transactional(readOnly = true)
+    public List<HistoryResponseDTO> getHistoryByUserId(Long userId) {
+        return historyRepository.findByUserId(userId).stream() // Cần phương thức findByUserId trong HistoryRepository
+                .map(historyMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<HistoryResponseDTO> getHistoriesBefore(Timestamp to) {
-        return historyRepository.findByTimestampBefore(to)
-                .stream()
-                .map(this::mapToDTO)
+    @Transactional(readOnly = true)
+    public List<HistoryResponseDTO> getHistoryByTarget(String targetType, Long targetId) {
+        return historyRepository.findByTargetTypeAndTargetId(targetType, targetId).stream() // Cần phương thức này
+                .map(historyMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
-    private HistoryResponseDTO mapToDTO(History history) {
-        return new HistoryResponseDTO(
-                history.getId(),
-                history.getUser().getId(),
-                history.getAction(),
-                history.getTargetType(),
-                history.getTargetId(),
-                history.getTimestamp()
-        );
+    @Override
+    // Sử dụng Propagation.REQUIRES_NEW để đảm bảo hành động được ghi lại
+    // ngay cả khi giao dịch chính bị lỗi và rollback.
+    // Hoặc nếu không cần mức độ đảm bảo này, có thể chỉ để @Transactional mặc định.
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void logAction(AppUser user, HistoryAction action, String targetType, Long targetId, String detailJson) {
+        History history = new History();
+        history.setUser(user);
+        history.setAction(action);
+        history.setTargetType(targetType);
+        history.setTargetId(targetId);
+        history.setDetailJson(detailJson);
+        // timestamp sẽ tự động được tạo bởi @CreationTimestamp
+
+        historyRepository.save(history);
     }
 }

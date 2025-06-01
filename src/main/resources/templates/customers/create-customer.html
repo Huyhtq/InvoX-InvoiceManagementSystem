@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="layout :: layout">
+        <div th:fragment="content">
+            <div class="container-fluid p-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 th:text="${customer.id != null} ? 'Chỉnh sửa Khách hàng' : 'Thêm Khách hàng mới'">Thêm Khách hàng mới</h2>
+                        <p class="text-muted">Nhập thông tin chi tiết cho khách hàng của bạn</p>
+                    </div>
+                </div>
+
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <span th:text="${error}"></span>
+                </div>
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <span th:text="${successMessage}"></span>
+                </div>
+
+                <div class="card p-4 shadow-sm">
+                    <form th:action="@{${customer.id != null} ? '/customers/edit/' + ${customer.id} : '/customers/new'}" th:object="${customer}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="mb-3">
+                            <label for="nameInput" class="form-label">Tên khách hàng</label>
+                            <input type="text" class="form-control" id="nameInput" th:field="*{name}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phoneInput" class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" id="phoneInput" th:field="*{phone}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="emailInput" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="emailInput" th:field="*{email}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="addressInput" class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" id="addressInput" th:field="*{address}">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="birthDateInput" class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-control" id="birthDateInput" th:field="*{birthDate}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="genderSelect" class="form-label">Giới tính</label>
+                                <select class="form-select" id="genderSelect" th:field="*{gender}">
+                                    <option value="">-- Chọn giới tính --</option>
+                                    <option th:each="genderOption : ${genders}"
+                                            th:value="${genderOption}"
+                                            th:text="${genderOption.displayName}"
+                                            th:selected="${customer.gender == genderOption}">
+                                        Male
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary me-2">Lưu</button>
+                        <a th:href="@{/customers}" class="btn btn-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div th:fragment="scripts">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js"></script>
+            <script type="text/javascript" th:src="@{/js/script.js}"></script>
+            <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
+        </div>
+    </div>
+</html>
