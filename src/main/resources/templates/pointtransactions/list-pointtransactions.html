@@ -5,12 +5,12 @@
             <div class="container-fluid p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h1 class="h3 mb-0 text-dark">Lịch sử Giao dịch điểm</h1>
-                        <p class="text-muted">Xem chi tiết các giao dịch tích lũy và đổi điểm của khách hàng</p>
+                        <h1 class="h3 mb-0 text-dark">Point Transaction History</h1>
+                        <p class="text-muted">View details of customers’ points accumulation and redemption transactions</p>
                     </div>
                     <div>
                         <a th:href="@{/customers}" class="btn btn-info">
-                            <i class="bi bi-people me-1"></i> Quản lý Khách hàng
+                            <i class="bi bi-people me-1"></i> Manage Customers
                         </a>
                     </div>
                 </div>
@@ -29,9 +29,9 @@
                     <div class="card-body">
                         <form th:action="@{/point-transactions}" method="get" class="row g-3 align-items-center">
                             <div class="col-md-6">
-                                <label for="customerSelect" class="form-label visually-hidden">Chọn khách hàng</label>
+                                <label for="customerSelect" class="form-label visually-hidden">Select Customer</label>
                                 <select class="form-select shadow-none" id="customerSelect" name="customerId">
-                                    <option value="">-- Chọn Khách hàng để xem lịch sử --</option>
+                                    <option value="">-- Select Customer to view history --</option>
                                     <option th:each="customer : ${customers}"
                                             th:value="${customer.id}"
                                             th:text="${customer.name} + ' (' + ${customer.phone} + ')'"
@@ -41,12 +41,12 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary">Xem lịch sử</button>
+                                <button type="submit" class="btn btn-primary">View History</button>
                             </div>
                             <div class="col-md-3 text-end" th:if="${selectedCustomer != null}">
-                                <h6 class="mb-0">Tổng điểm: <span th:text="${selectedCustomer.totalPoints}"></span></h6>
-                                <h6 class="mb-0">Điểm khả dụng: <span th:text="${selectedCustomer.availablePoints}"></span></h6>
-                                <h6 class="mb-0">Hạng: <span th:text="${selectedCustomer.memberRank?.name}"></span></h6>
+                                <h6 class="mb-0">Total Points: <span th:text="${selectedCustomer.totalPoints}"></span></h6>
+                                <h6 class="mb-0">Available Points: <span th:text="${selectedCustomer.availablePoints}"></span></h6>
+                                <h6 class="mb-0">Rank: <span th:text="${selectedCustomer.memberRank?.name}"></span></h6>
                             </div>
                         </form>
                     </div>
@@ -54,21 +54,21 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Lịch sử giao dịch</h5>
+                        <h5 class="card-title mb-0">Transaction History</h5>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="bg-light">
                                     <tr>
-                                        <th class="py-3 ps-4">ID Giao dịch</th>
-                                        <th class="py-3">Loại giao dịch</th>
-                                        <th class="py-3">Số điểm</th>
-                                        <th class="py-3">Tổng điểm sau</th>
-                                        <th class="py-3">Điểm khả dụng sau</th>
-                                        <th class="py-3">Ngày giao dịch</th>
-                                        <th class="py-3">Mô tả</th>
-                                        <th class="py-3">ID Hóa đơn</th>
+                                        <th class="py-3 ps-4">Transaction ID</th>
+                                        <th class="py-3">Transaction Type</th>
+                                        <th class="py-3">Points Amount</th>
+                                        <th class="py-3">Total Points After</th>
+                                        <th class="py-3">Available Points After</th>
+                                        <th class="py-3">Transaction Date</th>
+                                        <th class="py-3">Description</th>
+                                        <th class="py-3">Invoice ID</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -82,13 +82,13 @@
                                         <td th:text="${transaction.currentTotalPoints}">1000</td>
                                         <td th:text="${transaction.currentAvailablePoints}">500</td>
                                         <td th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
-                                        <td th:text="${transaction.description}">Tích điểm từ hóa đơn #123</td>
+                                        <td th:text="${transaction.description}">Points earned from invoice #123</td>
                                         <td th:text="${transaction.invoiceId ?: 'N/A'}">123</td>
                                     </tr>
                                     <tr th:if="${#lists.isEmpty(transactions)}">
                                         <td colspan="8" class="text-center py-4">
                                             <i class="bi bi-inbox fs-1 text-muted"></i>
-                                            <p class="mt-2 mb-0">Không tìm thấy giao dịch điểm nào</p>
+                                            <p class="mt-2 mb-0">No point transactions found</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -98,7 +98,7 @@
                     <div class="card-footer">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="text-muted">Đang hiển thị <span th:text="${#lists.size(transactions)}">0</span> bản ghi</span>
+                                <span class="text-muted">Showing <span th:text="${#lists.size(transactions)}">0</span> records</span>
                             </div>
                         </div>
                     </div>

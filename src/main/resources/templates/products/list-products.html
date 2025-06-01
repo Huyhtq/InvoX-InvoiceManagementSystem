@@ -1,212 +1,326 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <div th:replace="layout :: layout">
-        <div th:fragment="content">
-            <div class="container-fluid p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h1 class="h3 mb-0 text-dark">Quản lý Sản phẩm</h1>
-                        <p class="text-muted">Quản lý danh sách sản phẩm và tồn kho</p>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <a th:href="@{/products/new}" class="btn btn-success">
-                            <i class="bi bi-plus-circle me-1"></i> Thêm sản phẩm
-                        </a>
-                    </div>
-                </div>
+  <div th:replace="layout :: layout">
+    <div th:fragment="content">
+      <div class="container-fluid p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h1 class="h3 mb-0 text-dark">Product Management</h1>
+            <p class="text-muted">Manage product list and inventory</p>
+          </div>
+          <div class="d-flex align-items-center">
+            <a th:href="@{/products/new}" class="btn btn-success">
+              <i class="bi bi-plus-circle me-1"></i> Add Product
+            </a>
+          </div>
+        </div>
 
-                <div class="row mb-4">
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="card stat-card">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-muted mb-1">Tổng số sản phẩm</h6>
-                                    <h3 class="mb-0" th:text="${#lists.size(productList)}">0</h3>
-                                </div>
-                                <div class="card-icon text-success">
-                                    <i class="bi bi-box-seam fs-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="card stat-card">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-muted mb-1">Sản phẩm còn hàng</h6>
-                                    <h3 class="mb-0" th:text="${#lists.size(productList.?[quantity > 0])}">0</h3>
-                                </div>
-                                <div class="card-icon text-info">
-                                    <i class="bi bi-check-circle fs-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <div class="card stat-card">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-muted mb-1">Sản phẩm hết hàng</h6>
-                                    <h3 class="mb-0" th:text="${#lists.size(productList.?[quantity == 0])}">0</h3>
-                                </div>
-                                <div class="card-icon text-warning">
-                                    <i class="bi bi-x-circle fs-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="row mb-4">
+          <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Total Products</h6>
+                  <h3 class="mb-0" th:text="${#lists.size(productList)}">0</h3>
                 </div>
-
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <form th:action="@{/products}" method="get" class="row g-3 align-items-center">
-                            <div class="col-md-6">
-                                <div class="position-relative">
-                                    <iconify-icon icon="material-symbols:search" width="20" height="20" class="position-absolute top-50 start-0 translate-middle-y ms-2"></iconify-icon>
-                                    <input type="text" id="searchInput" name="searchTerm" class="form-control ps-5 shadow-none" placeholder="Tìm kiếm sản phẩm theo tên, ID..." th:value="${searchTerm}">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <select class="form-select shadow-none" id="statusFilter" name="status"
-                                        th:data-selected-status="${status?.name()}"> <option value="">Tất cả trạng thái</option>
-                                    <option th:each="statusOption : ${productStatuses}"
-                                            th:value="${statusOption.name()}"
-                                            th:text="${statusOption.displayName}"
-                                            th:selected="${statusOption == status}"> Active
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <select class="form-select shadow-none" id="categoryFilter" name="categoryId"
-                                        th:data-selected-category-id="${categoryId}"> <option value="">Tất cả danh mục</option>
-                                    <option th:each="categoryOption : ${categories}"
-                                            th:value="${categoryOption.id}"
-                                            th:text="${categoryOption.name}"
-                                            th:selected="${categoryOption.id == categoryId}">
-                                        Category 1
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="col-12 text-end">
-                                <button type="submit" class="btn btn-primary">Áp dụng bộ lọc</button>
-                                <a th:href="@{/products}" class="btn btn-outline-secondary">Xóa bộ lọc</a>
-                            </div>
-                        </form>
-                    </div>
+                <div class="card-icon text-success">
+                  <i class="bi bi-box-seam fs-1"></i>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Products In Stock</h6>
+                  <h3
+                    class="mb-0"
+                    th:text="${#lists.size(productList.?[quantity > 0])}"
+                  >
+                    0
+                  </h3>
+                </div>
+                <div class="card-icon text-info">
+                  <i class="bi bi-check-circle fs-1"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card stat-card">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted mb-1">Out of Stock Products</h6>
+                  <h3
+                    class="mb-0"
+                    th:text="${#lists.size(productList.?[quantity == 0])}"
+                  >
+                    0
+                  </h3>
+                </div>
+                <div class="card-icon text-warning">
+                  <i class="bi bi-x-circle fs-1"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Danh mục sản phẩm</h5>
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-secondary active" id="tableViewBtn">
-                                <i class="bi bi-list"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary" id="gridViewBtn">
-                                <i class="bi bi-grid"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th class="py-3 ps-4">ID</th>
-                                        <th class="py-3">Tên sản phẩm</th>
-                                        <th class="py-3">SKU</th> <th class="py-3">Danh mục</th>
-                                        <th class="py-3">Giá</th>
-                                        <th class="py-3">Tồn kho</th>
-                                        <th class="py-3">Trạng thái</th>
-                                        <th class="py-3 text-end pe-4">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="product : ${productList}">
-                                        <td class="ps-4" th:text="${product.id}">1</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="book-color-indicator me-2" th:classappend="${product.quantity > 0 ? 'bg-success' : 'bg-danger'}"></div>
-                                                <span th:text="${product.name}">Laptop XYZ</span>
-                                            </div>
-                                        </td>
-                                        <td th:text="${product.sku}">LTGXYZ001</td> <td th:text="${product.category?.name}">Electronics</td>
-                                        <td th:text="${#numbers.formatCurrency(product.price)}">10,000,000đ</td>
-                                        <td><span class="quantity-badge" th:text="${product.quantity}">5</span></td>
-                                        <td>
-                                            <span class="status-badge"
-                                                  th:classappend="${product.status == T(com.invox.invoice_system.enums.ProductStatus).ACTIVE ? 'status-badge delivered' :
+        <div class="card mb-4">
+          <div class="card-body">
+            <form
+              th:action="@{/products}"
+              method="get"
+              class="row g-3 align-items-center"
+            >
+              <div class="col-md-6">
+                <div class="position-relative">
+                  <iconify-icon
+                    icon="material-symbols:search"
+                    width="20"
+                    height="20"
+                    class="position-absolute top-50 start-0 translate-middle-y ms-2"
+                  ></iconify-icon>
+                  <input
+                    type="text"
+                    id="searchInput"
+                    name="searchTerm"
+                    class="form-control ps-5 shadow-none"
+                    placeholder="Search products by name, ID..."
+                    th:value="${searchTerm}"
+                  />
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select
+                  class="form-select shadow-none"
+                  id="statusFilter"
+                  name="status"
+                  th:data-selected-status="${status?.name()}"
+                >
+                  <option value="">All statuses</option>
+                  <option
+                    th:each="statusOption : ${productStatuses}"
+                    th:value="${statusOption.name()}"
+                    th:text="${statusOption.displayName}"
+                    th:selected="${statusOption == status}"
+                  >
+                    Active
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <select
+                  class="form-select shadow-none"
+                  id="categoryFilter"
+                  name="categoryId"
+                  th:data-selected-category-id="${categoryId}"
+                >
+                  <option value="">All categories</option>
+                  <option
+                    th:each="categoryOption : ${categories}"
+                    th:value="${categoryOption.id}"
+                    th:text="${categoryOption.name}"
+                    th:selected="${categoryOption.id == categoryId}"
+                  >
+                    Category 1
+                  </option>
+                </select>
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary">
+                  Apply Filters
+                </button>
+                <a th:href="@{/products}" class="btn btn-outline-secondary"
+                  >Clear Filters</a
+                >
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <h5 class="card-title mb-0">Product List</h5>
+            <div class="btn-group btn-group-sm" role="group">
+              <button
+                type="button"
+                class="btn btn-outline-secondary active"
+                id="tableViewBtn"
+              >
+                <i class="bi bi-list"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                id="gridViewBtn"
+              >
+                <i class="bi bi-grid"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="py-3 ps-4">ID</th>
+                    <th class="py-3">Product Name</th>
+                    <th class="py-3">SKU</th>
+                    <th class="py-3">Category</th>
+                    <th class="py-3">Price</th>
+                    <th class="py-3">Stock</th>
+                    <th class="py-3">Status</th>
+                    <th class="py-3 text-end pe-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="product : ${productList}">
+                    <td class="ps-4" th:text="${product.id}">1</td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div
+                          class="book-color-indicator me-2"
+                          th:classappend="${product.quantity > 0 ? 'bg-success' : 'bg-danger'}"
+                        ></div>
+                        <span th:text="${product.name}">Laptop XYZ</span>
+                      </div>
+                    </td>
+                    <td th:text="${product.sku}">LTGXYZ001</td>
+                    <td th:text="${product.category?.name}">Electronics</td>
+                    <td th:text="${#numbers.formatCurrency(product.price)}">
+                      10,000,000đ
+                    </td>
+                    <td>
+                      <span class="quantity-badge" th:text="${product.quantity}"
+                        >5</span
+                      >
+                    </td>
+                    <td>
+                      <span
+                        class="status-badge"
+                        th:classappend="${product.status == T(com.invox.invoice_system.enums.ProductStatus).ACTIVE ? 'status-badge delivered' :
                                                                   (product.status == T(com.invox.invoice_system.enums.ProductStatus).INACTIVE ? 'status-badge shipping' :
                                                                   (product.status == T(com.invox.invoice_system.enums.ProductStatus).OOS ? 'status-badge confirmed' : ''))}"
-                                                  th:text="${product.status.displayName}">
-                                                Active
-                                            </span>
-                                        </td>
-                                        <td class="text-end pe-4">
-                                            <div class="btn-group">
-                                                <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <form th:action="@{/products/delete/{id}(id=${product.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr th:if="${#lists.isEmpty(productList)}">
-                                        <td colspan="8" class="text-center py-4"> <i class="bi bi-inbox fs-1 text-muted"></i>
-                                            <p class="mt-2 mb-0">Không tìm thấy sản phẩm nào</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="grid-view" style="display: none;">
-                            <div class="row">
-                                <div class="col-md-4 mb-3" th:each="product : ${productList}">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h5 th:text="${product.name}">Laptop XYZ</h5>
-                                            <p class="mb-1">SKU: <span th:text="${product.sku}">LTGXYZ001</span></p> <p class="mb-1">Danh mục: <span th:text="${product.category?.name}">Electronics</span></p>
-                                            <p class="mb-1">Giá: <span th:text="${#numbers.formatCurrency(product.price)}">10,000,000đ</span></p>
-                                            <p class="mb-1">Tồn kho: <span th:text="${product.quantity}">5</span></p>
-                                            <p class="mb-1">Trạng thái: <span th:text="${product.status.displayName}">Active</span></p>
-                                            <div class="btn-group">
-                                                <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <form th:action="@{/products/delete/{id}(id=${product.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="text-muted">Đang hiển thị <span th:text="${#lists.size(productList)}">0</span> bản ghi</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        th:text="${product.status.displayName}"
+                      >
+                        Active
+                      </span>
+                    </td>
+                    <td class="text-end pe-4">
+                      <div class="btn-group">
+                        <a
+                          th:href="@{/products/edit/{id}(id=${product.id})}"
+                          class="btn btn-sm btn-outline-secondary"
+                        >
+                          <i class="bi bi-pencil"></i>
+                        </a>
+                        <form
+                          th:action="@{/products/delete/{id}(id=${product.id})}"
+                          method="post"
+                          onsubmit="return confirm('Are you sure you want to delete this product?');"
+                        >
+                          <button
+                            type="submit"
+                            class="btn btn-sm btn-outline-danger"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr th:if="${#lists.isEmpty(productList)}">
+                    <td colspan="8" class="text-center py-4">
+                      <i class="bi bi-inbox fs-1 text-muted"></i>
+                      <p class="mt-2 mb-0">No products found</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+
+            <div class="grid-view" style="display: none">
+              <div class="row">
+                <div class="col-md-4 mb-3" th:each="product : ${productList}">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 th:text="${product.name}">Laptop XYZ</h5>
+                      <p class="mb-1">
+                        SKU: <span th:text="${product.sku}">LTGXYZ001</span>
+                      </p>
+                      <p class="mb-1">
+                        Category:
+                        <span th:text="${product.category?.name}"
+                          >Electronics</span
+                        >
+                      </p>
+                      <p class="mb-1">
+                        Price:
+                        <span
+                          th:text="${#numbers.formatCurrency(product.price)}"
+                          >10,000,000đ</span
+                        >
+                      </p>
+                      <p class="mb-1">
+                        Stock: <span th:text="${product.quantity}">5</span>
+                      </p>
+                      <p class="mb-1">
+                        Status:
+                        <span th:text="${product.status.displayName}"
+                          >Active</span
+                        >
+                      </p>
+                      <div class="btn-group">
+                        <a
+                          th:href="@{/products/edit/{id}(id=${product.id})}"
+                          class="btn btn-sm btn-outline-secondary"
+                        >
+                          <i class="bi bi-pencil"></i>
+                        </a>
+                        <form
+                          th:action="@{/products/delete/{id}(id=${product.id})}"
+                          method="post"
+                          onsubmit="return confirm('Are you sure you want to delete this product?');"
+                        >
+                          <button
+                            type="submit"
+                            class="btn btn-sm btn-outline-danger"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-muted"
+                  >Showing
+                  <span th:text="${#lists.size(productList)}">0</span>
+                  records</span
+                >
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <div th:fragment="scripts">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js"></script>
-            <script type="text/javascript" th:src="@{/js/products.js}"></script> 
-            <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
-        </div>
+      </div>
     </div>
+
+    <div th:fragment="scripts">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js"></script>
+      <script type="text/javascript" th:src="@{/js/products.js}"></script>
+      <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
+    </div>
+  </div>
 </html>

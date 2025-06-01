@@ -1,59 +1,104 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-    <div th:replace="layout :: layout">
-        <div th:fragment="content">
-            <div class="container-fluid p-4">
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h2 th:text="${memberRank.id != null} ? 'Chỉnh sửa Hạng thành viên' : 'Thêm Hạng thành viên mới'">Thêm Hạng thành viên mới</h2>
-                        <p class="text-muted">Nhập thông tin chi tiết cho hạng thành viên</p>
-                    </div>
-                </div>
+  <div th:replace="layout :: layout">
+    <div th:fragment="content">
+      <div class="container-fluid p-4">
+        <div class="row mb-4">
+          <div class="col-12">
+            <h2
+              th:text="${memberRank.id != null} ? 'Edit Member Rank' : 'Add New Member Rank'"
+            >
+              Add New Member Rank
+            </h2>
+            <p class="text-muted">
+              Enter detailed information for the member rank
+            </p>
+          </div>
+        </div>
 
-                <div th:if="${error}" class="alert alert-danger" role="alert">
-                    <span th:text="${error}"></span>
-                </div>
-                <div th:if="${successMessage}" class="alert alert-success" role="alert">
-                    <span th:text="${successMessage}"></span>
-                </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+          <span th:text="${error}"></span>
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+          <span th:text="${successMessage}"></span>
+        </div>
 
-                <div class="card p-4 shadow-sm">
-                    <form th:action="@{${memberRank.id != null} ? '/member-ranks/edit/' + ${memberRank.id} : '/member-ranks/new'}" th:object="${memberRank}" method="post">
-                        <input type="hidden" th:field="*{id}">
+        <div class="card p-4 shadow-sm">
+          <form
+            th:action="@{${memberRank.id != null} ? '/member-ranks/edit/' + ${memberRank.id} : '/member-ranks/new'}"
+            th:object="${memberRank}"
+            method="post"
+          >
+            <input type="hidden" th:field="*{id}" />
 
-                        <div class="mb-3">
-                            <label for="nameInput" class="form-label">Tên hạng</label>
-                            <input type="text" class="form-control" id="nameInput" th:field="*{name}" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="minTotalPointsInput" class="form-label">Điểm tối thiểu để đạt hạng</label>
-                            <input type="number" class="form-control" id="minTotalPointsInput" th:field="*{minTotalPoints}" min="0" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="pointsEarningRateInput" class="form-label">Tỷ lệ tích điểm (%)</label>
-                            <input type="number" step="0.01" class="form-control" id="pointsEarningRateInput" th:field="*{pointsEarningRate}" min="0" max="1" required>
-                            <div class="form-text text-muted">Nhập dưới dạng số thập phân (ví dụ: 0.01 cho 1%)</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="descriptionTextarea" class="form-label">Mô tả</label>
-                            <textarea class="form-control" id="descriptionTextarea" th:field="*{description}" rows="3"></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary me-2">Lưu</button>
-                        <a th:href="@{/member-ranks}" class="btn btn-secondary">Hủy</a>
-                    </form>
-                </div>
+            <div class="mb-3">
+              <label for="nameInput" class="form-label">Rank Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="nameInput"
+                th:field="*{name}"
+                required
+              />
             </div>
+
+            <div class="mb-3">
+              <label for="minTotalPointsInput" class="form-label"
+                >Minimum Points to Achieve Rank</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="minTotalPointsInput"
+                th:field="*{minTotalPoints}"
+                min="0"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="pointsEarningRateInput" class="form-label"
+                >Points Earning Rate (%)</label
+              >
+              <input
+                type="number"
+                step="0.01"
+                class="form-control"
+                id="pointsEarningRateInput"
+                th:field="*{pointsEarningRate}"
+                min="0"
+                max="1"
+                required
+              />
+              <div class="form-text text-muted">
+                Enter as a decimal (e.g., 0.01 for 1%)
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="descriptionTextarea" class="form-label"
+                >Description</label
+              >
+              <textarea
+                class="form-control"
+                id="descriptionTextarea"
+                th:field="*{description}"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary me-2">Save</button>
+            <a th:href="@{/member-ranks}" class="btn btn-secondary">Cancel</a>
+          </form>
         </div>
-        
-        <div th:fragment="scripts">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js"></script>
-            <script type="text/javascript" th:src="@{/js/products.js}"></script>
-            <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
-        </div>
+      </div>
     </div>
+
+    <div th:fragment="scripts">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js"></script>
+      <script type="text/javascript" th:src="@{/js/products.js}"></script>
+      <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
+    </div>
+  </div>
 </html>

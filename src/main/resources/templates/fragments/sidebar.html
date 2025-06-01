@@ -1,90 +1,199 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    </head>
-<body>
-    <div id="sidebar" class="d-flex flex-column flex-shrink-0 text-white" th:fragment="sidebar">
-        <div class="p-3 d-flex align-items-center"> <div class="d-flex align-items-center me-auto"> <img th:src="@{/images/main-logo1.svg}" class="img-fluid img me-2" alt="Logo">
-                <span class="text-white fw-bold fs-4">Invo<span class="bold">X</span></span>
-            </div>
-            <button class="btn btn-sm d-block d-lg-none" id="sidebarclose">
-                <iconify-icon icon="mdi:hamburger-menu-back" class="text-white" width="24" height="24"></iconify-icon>
-            </button>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head> </head>
+  <body>
+    <div
+      id="sidebar"
+      class="d-flex flex-column flex-shrink-0 text-white"
+      th:fragment="sidebar"
+    >
+      <div class="p-3 d-flex align-items-center">
+        <div class="d-flex align-items-center me-auto">
+          <img
+            th:src="@{/images/main-logo1.svg}"
+            class="img-fluid img me-2"
+            alt="Logo"
+          />
+          <span class="text-white fw-bold fs-2">
+            Invo<span class="bold fs-1">X</span>
+          </span>
         </div>
-        <hr class="mt-0 mb-2">
-        <ul class="nav flex-column mb-auto px-2 sidebar-nav-scroll"> <li class="nav-item">
-                <a th:href="@{/dashboard}" class="nav-link sidebar-link py-3" sec:authorize="isAuthenticated()">
-                    <iconify-icon icon="material-symbols:speed-outline" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Dashboard</span> 
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/invoices}" class="nav-link sidebar-link py-3" sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE')">
-                    <iconify-icon icon="mdi:receipt-text-outline" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Invoice</span> 
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/products}" class="nav-link sidebar-link py-3" sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE')">
-                    <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Product</span> 
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/customers}" class="nav-link sidebar-link py-3" sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE', 'ACCOUNTANT')">
-                    <iconify-icon icon="mdi:account-group-outline" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Customer</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/employees}" class="nav-link sidebar-link py-3" sec:authorize="hasRole('ADMIN')">
-                    <iconify-icon icon="mdi:account-tie-outline" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Employee</span> 
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/roles}" class="nav-link sidebar-link py-3" sec:authorize="hasRole('ADMIN')">
-                    <iconify-icon icon="mdi:shield-account-outline" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Role</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/users}" class="nav-link sidebar-link py-3" sec:authorize="hasRole('ADMIN')">
-                    <iconify-icon icon="mdi:account-cog-outline" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">User</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/categories}" class="nav-link sidebar-link py-3" sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE')">
-                    <iconify-icon icon="mdi:format-list-bulleted-type" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Category</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/member-ranks}" class="nav-link sidebar-link py-3" sec:authorize="hasAnyRole('ADMIN', 'ACCOUNTANT')">
-                    <iconify-icon icon="mdi:medal-outline" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Member Rank</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a th:href="@{/point-transactions}" class="nav-link sidebar-link py-3" sec:authorize="hasAnyRole('ADMIN', 'ACCOUNTANT')">
-                    <iconify-icon icon="mdi:cash-multiple" width="24" height="24"></iconify-icon>
-                    <span class="nav-link-text">Point Exchange</span>
-                </a>
-            </li>
-            <!--<li class="nav-item">
+        <button class="btn btn-sm d-block d-lg-none" id="sidebarclose">
+          <iconify-icon
+            icon="mdi:hamburger-menu-back"
+            class="text-white"
+            width="24"
+            height="24"
+          ></iconify-icon>
+        </button>
+      </div>
+      <hr class="mt-0 mb-2" />
+      <ul class="nav flex-column mb-auto px-2 sidebar-nav-scroll">
+        <li class="nav-item">
+          <a
+            th:href="@{/dashboard}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="isAuthenticated()"
+          >
+            <iconify-icon
+              icon="material-symbols:speed-outline"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/invoices}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE')"
+          >
+            <iconify-icon
+              icon="mdi:receipt-text-outline"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Invoice</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/products}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE')"
+          >
+            <iconify-icon
+              icon="mdi:package-variant"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Product</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/customers}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE', 'ACCOUNTANT')"
+          >
+            <iconify-icon
+              icon="mdi:account-group-outline"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Customer</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/employees}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasRole('ADMIN')"
+          >
+            <iconify-icon
+              icon="mdi:account-tie-outline"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Employee</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/roles}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasRole('ADMIN')"
+          >
+            <iconify-icon
+              icon="mdi:shield-account-outline"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Role</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/users}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasRole('ADMIN')"
+          >
+            <iconify-icon
+              icon="mdi:account-cog-outline"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">User</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/categories}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE')"
+          >
+            <iconify-icon
+              icon="mdi:format-list-bulleted-type"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Category</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/member-ranks}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasAnyRole('ADMIN', 'ACCOUNTANT')"
+          >
+            <iconify-icon
+              icon="mdi:medal-outline"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Member Rank</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            th:href="@{/point-transactions}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasAnyRole('ADMIN', 'ACCOUNTANT')"
+          >
+            <iconify-icon
+              icon="mdi:cash-multiple"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Point Exchange</span>
+          </a>
+        </li>
+        <!--<li class="nav-item">
                 <a th:href="@{/history}" class="nav-link sidebar-link py-3" sec:authorize="hasRole('ADMIN')">
                     <iconify-icon icon="mdi:history" width="24" height="24"></iconify-icon>
                     <span class="nav-link-text">History</span>
                 </a>
             </li>-->
-            <li class="nav-item">
-                <a th:href="@{/reports/financial}" class="nav-link sidebar-link py-3" sec:authorize="hasAnyRole('ADMIN', 'ACCOUNTANT')"> 
-                    <iconify-icon icon="mdi:finance" width="24" height="24"></iconify-icon> 
-                    <span class="nav-link-text">Financial Reports</span>
-                </a>
-            </li>
-        </ul>
+        <li class="nav-item">
+          <a
+            th:href="@{/reports/financial}"
+            class="nav-link sidebar-link py-3"
+            sec:authorize="hasAnyRole('ADMIN', 'ACCOUNTANT')"
+          >
+            <iconify-icon
+              icon="mdi:finance"
+              width="24"
+              height="24"
+            ></iconify-icon>
+            <span class="nav-link-text">Financial Reports</span>
+          </a>
+        </li>
+      </ul>
     </div>
-</body>
+  </body>
 </html>
