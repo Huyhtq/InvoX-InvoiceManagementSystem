@@ -13,7 +13,12 @@ import lombok.AllArgsConstructor;
 public class InvoiceDetail {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "invoicedetail_id_seq_gen")
+    @SequenceGenerator(
+        name = "invoicedetail_id_seq_gen",
+        sequenceName = "InvoiceDetail_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 
@@ -29,11 +34,11 @@ public class InvoiceDetail {
     private Long quantity;
 
     @Column(name = "unit_price", nullable = false)
-    private Double unitPrice; // Giá bán của sản phẩm tại thời điểm bán (snapshot)
+    private Long unitPrice; // Giá bán của sản phẩm tại thời điểm bán (snapshot)
 
     @Column(name = "product_name_snapshot", nullable = false, length = 100)
     private String productNameSnapshot; // Tên sản phẩm tại thời điểm bán (snapshot)
 
     @Column(name = "sub_total", nullable = false)
-    private Double subTotal; // Thành tiền cho dòng này (quantity * unitPrice)
+    private Long subTotal; // Thành tiền cho dòng này (quantity * unitPrice)
 }

@@ -51,7 +51,7 @@ public class RolePageController {
         Optional<RoleDTO> role = roleService.getRoleById(id);
         if (role.isPresent()) {
             model.addAttribute("role", role.get());
-            return "roles/edit-role";
+            return "roles/create-role";
         }
         return "redirect:/roles";
     }
@@ -68,7 +68,7 @@ public class RolePageController {
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("role", roleDTO);
-            return "roles/edit-role";
+            return "roles/create-role";
         }
     }
 

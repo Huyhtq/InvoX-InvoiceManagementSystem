@@ -23,7 +23,7 @@
         </div>
 
         <!-- Form -->
-        <form class="login-form" th:action="@{/invox/loginPage}" method="post">
+        <form class="login-form" th:action="@{/login}" method="post">
           <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
           <div class="input-group">
             <span class="input-icon">👤</span>

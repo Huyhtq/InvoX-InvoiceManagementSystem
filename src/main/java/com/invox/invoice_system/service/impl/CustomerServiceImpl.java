@@ -3,6 +3,7 @@ package com.invox.invoice_system.service.impl;
 import com.invox.invoice_system.dto.CustomerRequestDTO;
 import com.invox.invoice_system.dto.CustomerResponseDTO;
 import com.invox.invoice_system.entity.Customer;
+import com.invox.invoice_system.entity.Invoice;
 import com.invox.invoice_system.entity.MemberRank;
 import com.invox.invoice_system.mapper.CustomerMapper;
 import com.invox.invoice_system.mapper.MemberRankMapper;
@@ -172,5 +173,72 @@ public class CustomerServiceImpl implements CustomerService {
         );
 
         return customerMapper.toResponseDto(updatedCustomer);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CustomerResponseDTO> searchCustomersByTerm(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return customerRepository.findAll().stream().map(customerMapper::toResponseDto).collect(Collectors.toList());
+        }
+        return customerRepository.findByNameContainingIgnoreCaseOrPhoneContaining(searchTerm, searchTerm).stream()
+            .map(customerMapper::toResponseDto)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public CustomerResponseDTO redeemPointsFromCustomer(Long customerId, Long pointsToRedeem, Invoice invoice) { // Thêm Invoice invoice
+        if (pointsToRedeem <= 0) {
+            throw new IllegalArgumentException("Số điểm đổi phải lớn hơn 0.");
+        }
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy khách hàng với ID: " + customerId));
+
+        if (customer.getAvailablePoints() < pointsToRedeem) {
+            throw new IllegalArgumentException("Số điểm khả dụng ("+ customer.getAvailablePoints() +") không đủ để đổi " + pointsToRedeem + " điểm.");
+        }
+
+        customer.setAvailablePoints(customer.getAvailablePoints() - pointsToRedeem);
+        // totalPoints có thể không đổi khi redeem, tùy nghiệp vụ. Nếu có thì:
+        // customer.setTotalPoints(customer.getTotalPoints() - pointsToRedeem); // Xem xét nghiệp vụ này
+        Customer updatedCustomer = customerRepository.save(customer);
+
+        // Ghi log giao dịch điểm, giờ đã có invoice
+        String description = "Đổi " + pointsToRedeem + " điểm";
+        if (invoice != null && invoice.getId() != null) {
+            description += " cho hóa đơn #" + invoice.getId();
+        } else {
+            description += " (không có hóa đơn liên kết)"; // Hoặc "Đổi điểm thủ công"
+        }
+
+        pointTransactionService.createPointTransaction(
+            customer,
+            invoice, // <<<< TRUYỀN INVOICE VÀO ĐÂY
+            PointTransactionType.REDEEM,
+            -pointsToRedeem, // Điểm bị trừ là số âm
+            description
+        );
+
+        return customerMapper.toResponseDto(updatedCustomer);
+    }
+
+    @Transactional
+    public void updateCustomerPointsAfterEarning(Long customerId, Long pointsEarned) {
+        if (pointsEarned <= 0) {
+            return; // Hoặc throw exception nếu logic yêu cầu pointsEarned > 0
+        }
+        Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy khách hàng với ID: " + customerId));
+
+        customer.setTotalPoints(customer.getTotalPoints() + pointsEarned);
+        customer.setAvailablePoints(customer.getAvailablePoints() + pointsEarned);
+
+        MemberRank newRank = memberRankService.getMemberRankForPoints(customer.getTotalPoints());
+        if (newRank != null && (customer.getMemberRank() == null || !newRank.getId().equals(customer.getMemberRank().getId()))) {
+            customer.setMemberRank(newRank);
+        }
+        customerRepository.save(customer);
     }
 }

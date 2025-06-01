@@ -47,7 +47,7 @@ public class CategoryPageController {
         Optional<CategoryDTO> category = categoryService.getCategoryById(id);
         if (category.isPresent()) {
             model.addAttribute("category", category.get());
-            return "categories/edit-category";
+            return "categories/create-category";
         }
         return "redirect:/categories"; // Chuyển hướng nếu không tìm thấy
     }
@@ -60,7 +60,7 @@ public class CategoryPageController {
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("category", categoryDTO);
-            return "categories/edit-category";
+            return "categories/create-category";
         }
     }
 

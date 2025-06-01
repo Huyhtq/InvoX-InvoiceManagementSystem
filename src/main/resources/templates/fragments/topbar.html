@@ -1,0 +1,28 @@
+<nav id="topbar" class="navbar navbar-expand-lg navbar-light bg-light border-bottom" th:fragment="topbar" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <div class="container-fluid p-lg-4">
+        <button class="btn btn-sm p-0" id="sidebarToggle">
+            <iconify-icon icon="mdi:hamburger-menu-back" width="24" height="24"></iconify-icon>
+        </button>
+        <div class="d-flex align-items-center">
+
+            <div class="header-right me-3" sec:authorize="isAuthenticated()">
+                <div class="user-name" sec:authentication="name">User</div> <div class="user-title" sec:authentication="principal.authorities[0].authority">Role</div> </div>
+
+            <div class="dropdown">
+                <a class="dropdown-toggle d-flex align-items-center text-decoration-none" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img th:src="@{/images/avatar.png}" class="rounded-circle me-2" width="32" height="32" alt="Profile">
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="dropdown-item d-flex align-items-center">
+                                <iconify-icon icon="mdi:logout-variant" class="me-2" width="20" height="20"></iconify-icon>
+                                Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>

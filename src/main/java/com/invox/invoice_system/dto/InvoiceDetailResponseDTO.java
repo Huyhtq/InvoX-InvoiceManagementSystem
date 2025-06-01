@@ -12,7 +12,7 @@ public class InvoiceDetailResponseDTO {
     // Không cần InvoiceResponseDTO ở đây để tránh vòng lặp vô hạn
     private ProductResponseDTO product; // Thông tin sản phẩm (có thể là DTO rút gọn)
     private Long quantity;
-    private Double unitPrice;
+    private Long unitPrice;
     private String productNameSnapshot;
-    private Double subTotal;
+    private Long subTotal;
 }

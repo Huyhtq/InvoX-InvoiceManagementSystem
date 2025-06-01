@@ -17,10 +17,10 @@ public class InvoiceResponseDTO {
     private CustomerResponseDTO customer; // Thông tin khách hàng
     private EmployeeResponseDTO employee; // Thông tin nhân viên
     private LocalDateTime invoiceDate;
-    private Double totalAmount;
-    private Double discountAmount;
+    private Long totalAmount;
+    private Long discountAmount;
     private Long pointsRedeemed;
-    private Double finalAmount;
+    private Long finalAmount;
     private PaymentMethod paymentMethod;
     private InvoiceStatus status;
     private String notes;

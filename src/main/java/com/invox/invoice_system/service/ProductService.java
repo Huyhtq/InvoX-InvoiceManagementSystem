@@ -15,4 +15,5 @@ public interface ProductService {
     void deleteProduct(Long id);
     List<ProductResponseDTO> searchProducts(String searchTerm, ProductStatus status, Long categoryId);
     ProductResponseDTO updateProductQuantity(Long productId, Long quantityChange);
+    List<ProductResponseDTO> searchProductsByTerm(String searchTerm);
 }

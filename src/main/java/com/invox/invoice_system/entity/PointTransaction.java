@@ -17,7 +17,12 @@ import java.time.LocalDateTime;
 public class PointTransaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "pointtransaction_id_seq_gen") 
+    @SequenceGenerator(
+        name = "pointtransaction_id_seq_gen",
+        sequenceName = "PointTransaction_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 

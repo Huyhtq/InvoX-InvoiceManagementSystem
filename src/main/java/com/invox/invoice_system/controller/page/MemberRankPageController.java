@@ -51,7 +51,7 @@ public class MemberRankPageController {
         Optional<MemberRankDTO> memberRank = memberRankService.getMemberRankById(id);
         if (memberRank.isPresent()) {
             model.addAttribute("memberRank", memberRank.get());
-            return "memberranks/edit-memberrank";
+            return "memberranks/create-memberrank";
         }
         return "redirect:/member-ranks";
     }
@@ -68,7 +68,7 @@ public class MemberRankPageController {
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("memberRank", memberRankDTO);
-            return "memberranks/edit-memberrank";
+            return "memberranks/create-memberrank";
         }
     }
 

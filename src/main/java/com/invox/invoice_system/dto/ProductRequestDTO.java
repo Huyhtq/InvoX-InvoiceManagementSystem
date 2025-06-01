@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductRequestDTO {
+    private Long id;
+    private String sku;
     private String name;
-    private Double price;
-    private Double costPrice;
+    private Long price;
+    private Long costPrice;
     private Long quantity;
     private Long categoryId; // Chỉ cần ID để liên kết
     private String brand;

@@ -69,7 +69,7 @@ public class AppUserPageController {
             model.addAttribute("user", userRegistrationDTO);
             model.addAttribute("employees", employeeService.getAllEmployees());
             model.addAttribute("roles", roleService.getAllRoles());
-            return "users/edit-user";
+            return "users/register-user";
         }
         return "redirect:/users";
     }
@@ -88,7 +88,7 @@ public class AppUserPageController {
             model.addAttribute("user", userRegistrationDTO);
             model.addAttribute("employees", employeeService.getAllEmployees());
             model.addAttribute("roles", roleService.getAllRoles());
-            return "users/edit-user";
+            return "users/register-user";
         }
     }
 

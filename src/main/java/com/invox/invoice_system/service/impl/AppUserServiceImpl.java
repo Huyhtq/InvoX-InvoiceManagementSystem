@@ -11,23 +11,59 @@ import com.invox.invoice_system.repository.EmployeeRepository;
 import com.invox.invoice_system.repository.RoleRepository;
 import com.invox.invoice_system.service.AppUserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder; 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AppUserServiceImpl implements AppUserService {
+public class AppUserServiceImpl implements AppUserService,UserDetailsService {
 
     private final AppUserRepository appUserRepository;
     private final EmployeeRepository employeeRepository;
     private final RoleRepository roleRepository;
     private final AppUserMapper appUserMapper;
     private final PasswordEncoder passwordEncoder; 
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // 1. Tìm AppUser từ database
+        AppUser appUser = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Người dùng không tìm thấy với tên đăng nhập: " + username));
+
+        // 2. Chuyển đổi vai trò (Role) của AppUser thành GrantedAuthority của Spring Security
+        // Spring Security yêu cầu các vai trò phải bắt đầu bằng tiền tố "ROLE_"
+        // Đảm bảo tên vai trò trong database của bạn (ví dụ: 'ROLE_ADMIN') đã có tiền tố này
+        // Nếu tên vai trò trong DB KHÔNG có tiền tố "ROLE_", bạn cần thêm nó vào đây:
+        // Ví dụ: List.of(new SimpleGrantedAuthority("ROLE_" + appUser.getRole().getName()))
+        List<SimpleGrantedAuthority> authorities = Collections.singletonList(
+                new SimpleGrantedAuthority(appUser.getRole().getName())
+        );
+        // Hoặc nếu role là danh sách nhiều vai trò:
+        // List<GrantedAuthority> authorities = appUser.getRoles().stream()
+        //     .map(role -> new SimpleGrantedAuthority(role.getName()))
+        //     .collect(Collectors.toList());
+
+        // 3. Trả về đối tượng UserDetails của Spring Security
+        // Đây là đối tượng User mặc định của Spring Security.
+        // Nó chứa username, password (đã băm), và danh sách các quyền/vai trò.
+        return new org.springframework.security.core.userdetails.User(
+                appUser.getUsername(),        // Username (tên đăng nhập)
+                appUser.getPassword(),        // Mật khẩu (đã băm từ DB)
+                authorities                   // Danh sách các quyền/vai trò
+        );
+    }
 
     @Override
     @Transactional(readOnly = true)

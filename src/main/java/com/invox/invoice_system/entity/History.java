@@ -17,7 +17,12 @@ import java.time.LocalDateTime;
 public class History {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "history_id_seq_gen")
+    @SequenceGenerator(
+        name = "history_id_seq_gen",
+        sequenceName = "History_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 

@@ -2,18 +2,39 @@ package com.invox.invoice_system.mapper;
 
 import com.invox.invoice_system.entity.Category;
 import com.invox.invoice_system.dto.CategoryDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component; // Quan trọng để Spring quản lý nó
 
-@Mapper(componentModel = "spring") // Make this a Spring component
-public interface CategoryMapper {
+@Component // Đánh dấu là Spring Component để có thể @Autowired
+public class CategoryMapper {
 
-    // Instance for manual use if not using Spring component model
-    CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
+    public CategoryDTO toDto(Category category) {
+        if (category == null) {
+            return null;
+        }
+        CategoryDTO dto = new CategoryDTO();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
+        dto.setDescription(category.getDescription());
+        return dto;
+    }
 
-    // Convert Category Entity to CategoryDTO
-    CategoryDTO toDto(Category category);
+    public Category toEntity(CategoryDTO categoryDTO) {
+        if (categoryDTO == null) {
+            return null;
+        }
+        Category entity = new Category();
+        entity.setId(categoryDTO.getId()); // ID có thể null khi tạo mới
+        entity.setName(categoryDTO.getName());
+        entity.setDescription(categoryDTO.getDescription());
+        return entity;
+    }
 
-    // Convert CategoryDTO to Category Entity
-    Category toEntity(CategoryDTO categoryDTO);
+    // Phương thức này có thể hữu ích khi cập nhật một Entity hiện có
+    public void updateEntityFromDto(CategoryDTO categoryDTO, Category category) {
+        if (categoryDTO == null || category == null) {
+            return;
+        }
+        category.setName(categoryDTO.getName());
+        category.setDescription(categoryDTO.getDescription());
+    }
 }

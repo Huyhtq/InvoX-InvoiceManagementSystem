@@ -1,79 +1,114 @@
+
 package com.invox.invoice_system.mapper;
 
 import com.invox.invoice_system.entity.Invoice;
-import com.invox.invoice_system.entity.Customer; // Import for mapping ID
-import com.invox.invoice_system.entity.Employee; // Import for mapping ID
-import com.invox.invoice_system.enums.PaymentMethod; // Import enum
+import com.invox.invoice_system.entity.Customer;
+import com.invox.invoice_system.entity.InvoiceDetail;
+import com.invox.invoice_system.enums.PaymentMethod;
 import com.invox.invoice_system.dto.InvoiceCreationRequestDTO;
 import com.invox.invoice_system.dto.InvoiceResponseDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring", uses = {CustomerMapper.class, EmployeeMapper.class, InvoiceDetailMapper.class})
-public interface InvoiceMapper {
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    InvoiceMapper INSTANCE = Mappers.getMapper(InvoiceMapper.class);
+@Component
+@RequiredArgsConstructor
+public class InvoiceMapper {
 
-    @Mapping(source = "customer", target = "customer")
-    @Mapping(source = "employee", target = "employee")
-    @Mapping(source = "invoiceDetails", target = "invoiceDetails")
-    InvoiceResponseDTO toResponseDto(Invoice invoice);
+    private final CustomerMapper customerMapper;
+    private final EmployeeMapper employeeMapper;
+    private final InvoiceDetailMapper invoiceDetailMapper; // Inject InvoiceDetailMapper
 
-    // Mapping for Invoice creation request
-    @Mapping(source = "customerId", target = "customer.id")
-    @Mapping(source = "employeeId", target = "employee.id")
-    @Mapping(source = "paymentMethod", target = "paymentMethod") // Direct mapping for Enum
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "invoiceDate", ignore = true) // Set by service
-    @Mapping(target = "totalAmount", ignore = true) // Calculated by service
-    @Mapping(target = "discountAmount", ignore = true) // Handled by service
-    @Mapping(target = "pointsRedeemed", ignore = true) // Handled by service
-    @Mapping(target = "finalAmount", ignore = true) // Calculated by service
-    @Mapping(target = "status", ignore = true) // Set by service
-    @Mapping(target = "updatedAt", ignore = true) // Handled by @UpdateTimestamp
-    @Mapping(target = "pointTransactions", ignore = true) // Handled by service
-    @Mapping(source = "items", target = "invoiceDetails") // Map list of DTOs to list of Entities
-    Invoice toEntity(InvoiceCreationRequestDTO requestDTO);
-
-
-    // Helper for mapping Long ID to Customer entity
-    default Customer toCustomerEntity(Long customerId) {
-        if (customerId == null) return null;
-        Customer customer = new Customer();
-        customer.setId(customerId);
-        return customer;
-    }
-
-    // Helper for mapping Long ID to Employee entity
-    default Employee toEmployeeEntity(Long employeeId) {
-        if (employeeId == null) return null;
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        return employee;
-    }
-
-    // Helper for mapping String to PaymentMethod enum
-    @Named("mapPaymentMethod")
-    default PaymentMethod mapPaymentMethod(String method) {
-        if (method == null) {
+    // Convert Invoice Entity to InvoiceResponseDTO
+    public InvoiceResponseDTO toResponseDto(Invoice invoice) {
+        if (invoice == null) {
             return null;
         }
-        try {
-            return PaymentMethod.valueOf(method.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            // Handle invalid payment method string, perhaps log or throw custom exception
-            return null; // Or a default value
+
+        InvoiceResponseDTO dto = new InvoiceResponseDTO();
+        dto.setId(invoice.getId());
+        dto.setInvoiceDate(invoice.getInvoiceDate());
+        dto.setTotalAmount(invoice.getTotalAmount()); // Đảm bảo kiểu Long/BigDecimal khớp
+        dto.setDiscountAmount(invoice.getDiscountAmount()); // Đảm bảo kiểu Long/BigDecimal khớp
+        dto.setPointsRedeemed(invoice.getPointsRedeemed());
+        dto.setFinalAmount(invoice.getFinalAmount()); // Đảm bảo kiểu Long/BigDecimal khớp
+        dto.setPaymentMethod(invoice.getPaymentMethod()); // Enum PaymentMethod
+        dto.setStatus(invoice.getStatus()); // Enum InvoiceStatus
+        dto.setNotes(invoice.getNotes());
+        dto.setUpdatedAt(invoice.getUpdatedAt());
+
+        if (invoice.getCustomer() != null) {
+            dto.setCustomer(customerMapper.toResponseDto(invoice.getCustomer()));
+        } else {
+            dto.setCustomer(null);
         }
+        if (invoice.getEmployee() != null) {
+            dto.setEmployee(employeeMapper.toResponseDto(invoice.getEmployee()));
+        } else {
+            dto.setEmployee(null);
+        }
+
+        // Ánh xạ danh sách InvoiceDetail Entities sang InvoiceDetailResponseDTOs
+        if (invoice.getInvoiceDetails() != null) {
+            dto.setInvoiceDetails(invoice.getInvoiceDetails().stream()
+                    .map(invoiceDetailMapper::toResponseDto)
+                    .collect(Collectors.toList()));
+        } else {
+            dto.setInvoiceDetails(Collections.emptyList());
+        }
+
+        return dto;
     }
 
-    // Helper for mapping PaymentMethod enum to String
-    @Named("mapPaymentMethodToString")
-    default String mapPaymentMethodToString(PaymentMethod method) {
-        if (method == null) {
+    // Convert InvoiceCreationRequestDTO to Invoice Entity (khi tạo mới)
+    // Lưu ý: Các trường tính toán (totalAmount, finalAmount, etc.) sẽ được Service set
+    public Invoice toEntity(InvoiceCreationRequestDTO requestDTO) {
+        if (requestDTO == null) {
             return null;
         }
-        return method.name();
+
+        Invoice entity = new Invoice();
+        // ID, invoiceDate, totalAmount, discountAmount, pointsRedeemed, finalAmount, status, updatedAt, pointTransactions
+        // sẽ được Service hoặc JPA quản lý/set
+        entity.setNotes(requestDTO.getNotes());
+        
+        // Chuyển String sang Enum PaymentMethod
+        if (requestDTO.getPaymentMethod() != null && !requestDTO.getPaymentMethod().isEmpty()) {
+            try {
+                entity.setPaymentMethod(PaymentMethod.valueOf(requestDTO.getPaymentMethod().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                // Xử lý nếu string không khớp với enum (ví dụ: log lỗi, hoặc mặc định)
+                entity.setPaymentMethod(null); // Hoặc một giá trị mặc định
+            }
+        } else {
+            entity.setPaymentMethod(null);
+        }
+
+        // Customer và Employee sẽ được Service tìm và set dựa trên ID
+        if (requestDTO.getCustomerId() != null) {
+            Customer customerRef = new Customer();
+            customerRef.setId(requestDTO.getCustomerId());
+            entity.setCustomer(customerRef);
+        } else {
+            entity.setCustomer(null);
+        }
+
+        // Ánh xạ danh sách InvoiceDetailRequestDTOs sang InvoiceDetail Entities (không set Invoice cho detail ở đây)
+        if (requestDTO.getItems() != null && !requestDTO.getItems().isEmpty()) {
+            List<InvoiceDetail> invoiceDetails = requestDTO.getItems().stream()
+                    .map(invoiceDetailMapper::toEntity) // Gọi InvoiceDetailMapper
+                    .collect(Collectors.toList());
+            
+            // Quan trọng: Gán lại Invoice cho mỗi InvoiceDetail
+            invoiceDetails.forEach(detail -> detail.setInvoice(entity));
+            entity.setInvoiceDetails(invoiceDetails);
+        } else {
+            entity.setInvoiceDetails(Collections.emptyList());
+        }
+
+        return entity;
     }
 }

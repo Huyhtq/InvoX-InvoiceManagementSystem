@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="layout :: layout">
+        <div th:fragment="content">
+            <div class="container-fluid p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-0 text-dark">Lịch sử Hệ thống</h1>
+                        <p class="text-muted">Ghi lại các hành động quan trọng của người dùng</p>
+                    </div>
+                </div>
+
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <span th:text="${successMessage}"></span>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                </div>
+                <div th:if="${infoMessage}" class="alert alert-info" role="alert">
+                    <span th:text="${infoMessage}"></span>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form th:action="@{/history}" method="get" class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <label for="userSelect" class="form-label visually-hidden">Người dùng</label>
+                                <select class="form-select shadow-none" id="userSelect" name="userId">
+                                    <option value="">-- Tất cả người dùng --</option>
+                                    <option th:each="user : ${users}"
+                                            th:value="${user.id}"
+                                            th:text="${user.username}"
+                                            th:selected="${user.id == selectedUserId}">
+                                        charlie
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="actionSelect" class="form-label visually-hidden">Hành động</label>
+                                <select class="form-select shadow-none" id="actionSelect" name="targetType">
+                                    <option value="">-- Tất cả loại đối tượng --</option>
+                                    <option th:each="actionType : ${historyActions}"
+                                            th:value="${actionType.name()}"
+                                            th:text="${actionType.displayName}"
+                                            th:selected="${actionType.name() == selectedTargetType}">
+                                        CREATE
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="targetIdInput" class="form-label visually-hidden">ID đối tượng</label>
+                                <input type="number" class="form-control shadow-none" id="targetIdInput" name="targetId" placeholder="ID đối tượng bị ảnh hưởng" th:value="${selectedTargetId}">
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary">Áp dụng bộ lọc</button>
+                                <a th:href="@{/history}" class="btn btn-outline-secondary">Xóa bộ lọc</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Danh sách các hành động</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="py-3 ps-4">ID</th>
+                                        <th class="py-3">Người dùng</th>
+                                        <th class="py-3">Hành động</th>
+                                        <th class="py-3">Loại đối tượng</th>
+                                        <th class="py-3">ID đối tượng</th>
+                                        <th class="py-3">Thời gian</th>
+                                        <th class="py-3">Mô tả chi tiết</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="record : ${historyRecords}">
+                                        <td class="ps-4" th:text="${record.id}">1</td>
+                                        <td th:text="${record.userId}">3</td> <td th:text="${record.action.displayName}">CREATE</td>
+                                        <td th:text="${record.targetType}">Employee</td>
+                                        <td th:text="${record.targetId ?: 'N/A'}">2</td>
+                                        <td th:text="${#temporals.format(record.timestamp, 'dd-MM-yyyy HH:mm:ss')}"></td>
+                                        <td th:text="${record.detailJson ?: 'N/A'}">Created Bob's employee profile.</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(historyRecords)}">
+                                        <td colspan="7" class="text-center py-4">
+                                            <i class="bi bi-inbox fs-1 text-muted"></i>
+                                            <p class="mt-2 mb-0">Không tìm thấy bản ghi lịch sử nào</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted">Đang hiển thị <span th:text="${#lists.size(historyRecords)}">0</span> bản ghi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:fragment="scripts">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js"></script>
+            <script type="text/javascript" th:src="@{/js/products.js}"></script>
+            <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
+        </div>
+    </div>
+</html>

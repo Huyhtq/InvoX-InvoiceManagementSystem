@@ -13,7 +13,12 @@ import lombok.AllArgsConstructor;
 public class Category {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "category_id_seq_gen") 
+    @SequenceGenerator(
+        name = "category_id_seq_gen",
+        sequenceName = "Category_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 

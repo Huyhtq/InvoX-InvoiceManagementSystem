@@ -21,4 +21,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     // Tìm khách hàng có tổng điểm tích lũy lớn hơn hoặc bằng một ngưỡng nào đó (cho hạng thành viên)
     List<Customer> findByTotalPointsGreaterThanEqual(Long totalPoints);
+
+    List<Customer> findByNameContainingIgnoreCaseOrPhoneContaining(String name, String phone);
 }

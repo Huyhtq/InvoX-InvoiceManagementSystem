@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRegistrationDTO {
+    private Long id;
     private String username;
     private String password;
     private Long employeeId; // Liên kết với Employee đã tồn tại

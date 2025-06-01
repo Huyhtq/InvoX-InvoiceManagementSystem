@@ -19,7 +19,12 @@ import java.time.LocalDateTime;
 public class Invoice {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "invoice_id_seq_gen")
+    @SequenceGenerator(
+        name = "invoice_id_seq_gen",
+        sequenceName = "Invoice_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 
@@ -36,16 +41,16 @@ public class Invoice {
     private LocalDateTime invoiceDate;
 
     @Column(name = "total_amount", nullable = false)
-    private Double totalAmount; // Tổng tiền trước giảm giá và trừ điểm
+    private Long totalAmount; // Tổng tiền trước giảm giá và trừ điểm
 
     @Column(name = "discount_amount", nullable = false)
-    private Double discountAmount = 0.0; // Số tiền giảm giá
+    private Long discountAmount = 0L; // Số tiền giảm giá
 
     @Column(name = "points_redeemed", nullable = false)
     private Long pointsRedeemed = 0L; // Số điểm đã dùng
 
     @Column(name = "final_amount", nullable = false)
-    private Double finalAmount; // Tổng tiền cuối cùng khách phải trả
+    private Long finalAmount; // Tổng tiền cuối cùng khách phải trả
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", length = 50)

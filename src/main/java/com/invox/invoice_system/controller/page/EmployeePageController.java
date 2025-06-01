@@ -68,7 +68,7 @@ public class EmployeePageController {
 
             model.addAttribute("employee", employeeRequestDTO);
             model.addAttribute("employeeStatuses", EmployeeStatus.values());
-            return "employees/edit-employee";
+            return "employees/create-employee";
         }
         return "redirect:/employees";
     }
@@ -86,7 +86,7 @@ public class EmployeePageController {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("employee", employeeRequestDTO);
             model.addAttribute("employeeStatuses", EmployeeStatus.values());
-            return "employees/edit-employee";
+            return "employees/create-employee";
         }
     }
 

@@ -22,7 +22,12 @@ import java.time.LocalDateTime;
 public class Customer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "customer_id_seq_gen")
+    @SequenceGenerator(
+        name = "customer_id_seq_gen",
+        sequenceName = "Customer_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 

@@ -48,6 +48,10 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Tên sản phẩm đã tồn tại: " + productRequestDTO.getName());
         }
 
+        if (productRequestDTO.getSku() != null && productRepository.findBySku(productRequestDTO.getSku()).isPresent()) {
+            throw new IllegalArgumentException("Mã SKU sản phẩm đã tồn tại: " + productRequestDTO.getSku());
+        }
+
         // Kiểm tra categoryId tồn tại
         Category category = categoryRepository.findById(productRequestDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục với ID: " + productRequestDTO.getCategoryId()));
@@ -71,11 +75,19 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Tên sản phẩm đã tồn tại: " + productRequestDTO.getName());
         }
 
+        if (productRequestDTO.getSku() != null) {
+            Optional<Product> productWithSku = productRepository.findBySku(productRequestDTO.getSku());
+            if (productWithSku.isPresent() && !productWithSku.get().getId().equals(id)) {
+                throw new IllegalArgumentException("Mã SKU sản phẩm đã tồn tại: " + productRequestDTO.getSku());
+            }
+        }
+
         // Kiểm tra categoryId tồn tại
         Category category = categoryRepository.findById(productRequestDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục với ID: " + productRequestDTO.getCategoryId()));
 
         // Cập nhật các trường từ DTO vào Entity
+        existingProduct.setSku(productRequestDTO.getSku());
         existingProduct.setName(productRequestDTO.getName());
         existingProduct.setPrice(productRequestDTO.getPrice());
         existingProduct.setCostPrice(productRequestDTO.getCostPrice());
@@ -140,5 +152,16 @@ public class ProductServiceImpl implements ProductService {
 
         Product updatedProduct = productRepository.save(product);
         return productMapper.toResponseDto(updatedProduct);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponseDTO> searchProductsByTerm(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return productRepository.findAll().stream().map(productMapper::toResponseDto).collect(Collectors.toList());
+        }
+        return productRepository.findByNameContainingIgnoreCaseOrSkuContainingIgnoreCase(searchTerm, searchTerm).stream()
+            .map(productMapper::toResponseDto)
+            .collect(Collectors.toList());
     }
 }

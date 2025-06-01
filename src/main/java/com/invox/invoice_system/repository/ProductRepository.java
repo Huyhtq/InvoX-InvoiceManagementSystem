@@ -28,4 +28,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     //
     List<Product> findByCategory_IdAndStatus(Long categoryId, ProductStatus status);
+
+    // Tìm chính xác theo SKU
+    Optional<Product> findBySku(String sku); 
+
+    List<Product> findByNameContainingIgnoreCaseOrSkuContainingIgnoreCase(String nameTerm, String skuTerm);
 }

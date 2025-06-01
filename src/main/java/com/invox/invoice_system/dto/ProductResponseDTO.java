@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ProductResponseDTO {
     private Long id;
+    private String sku;
     private String name;
-    private Double price;
-    private Double costPrice;
+    private Long price;
+    private Long costPrice;
     private Long quantity;
     private CategoryDTO category; // Trả về Category dưới dạng DTO
     private String brand;

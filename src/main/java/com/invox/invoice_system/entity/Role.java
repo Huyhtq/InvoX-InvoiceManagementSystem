@@ -13,7 +13,12 @@ import lombok.AllArgsConstructor;
 public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "role_id_seq_gen") 
+    @SequenceGenerator(
+        name = "role_id_seq_gen",
+        sequenceName = "Role_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 

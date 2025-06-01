@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="~{layout :: layout}">
+        <div th:fragment="content">
+            <div class="container-fluid p-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="h3 mb-0 text-dark" th:text="${pageTitle}">Báo cáo Tài chính</h2>
+                        <p class="text-muted">Xem tổng quan và chi tiết tình hình tài chính.</p>
+                    </div>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+                <div class="card p-3 mb-4 shadow-sm">
+                    <form th:action="@{/reports/financial}" method="get" id="reportFilterForm">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label for="periodSelect" class="form-label">Khoảng thời gian</label>
+                                <select class="form-select" id="periodSelect" name="period">
+                                    <option value="">-- Tùy chọn --</option>
+                                    <option value="thismonth" th:selected="${selectedPeriod == 'thismonth'}">Tháng này</option>
+                                    <option value="lastmonth" th:selected="${selectedPeriod == 'lastmonth'}">Tháng trước</option>
+                                    <option value="last3months" th:selected="${selectedPeriod == 'last3months'}">3 tháng qua</option>
+                                    <option value="thisquarter" th:selected="${selectedPeriod == 'thisquarter'}">Quý này</option>
+                                    <option value="thisyear" th:selected="${selectedPeriod == 'thisyear'}">Năm nay</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="startDate" class="form-label">Hoặc từ ngày</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate" th:value="${selectedStartDate}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="endDate" class="form-label">Đến ngày</label>
+                                <input type="date" class="form-control" id="endDate" name="endDate" th:value="${selectedEndDate}">
+                            </div>
+                            <div class="col-md-auto">
+                                <button type="submit" class="btn btn-primary w-100">Xem báo cáo</button>
+                            </div>
+                             <div class="col-md-auto">
+                                <a th:href="@{/reports/financial}" class="btn btn-secondary w-100">Reset lọc</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div th:if="${reportData != null}">
+                    <p class="fst-italic">
+                        Báo cáo cho khoảng thời gian từ 
+                        <span th:text="${#temporals.format(reportData.startDate, 'dd/MM/yyyy')}"></span> 
+                        đến <span th:text="${#temporals.format(reportData.endDate, 'dd/MM/yyyy')}"></span>
+                    </p>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card text-white bg-primary shadow h-100">
+                                <div class="card-body">
+                                    <div class="fs-3 fw-bold" th:text="${#numbers.formatCurrency(reportData.totalRevenue)}">0 VNĐ</div>
+                                    <div>Tổng Doanh thu</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card text-white bg-warning shadow h-100">
+                                <div class="card-body">
+                                    <div class="fs-3 fw-bold" th:text="${#numbers.formatCurrency(reportData.totalCostOfGoods)}">0 VNĐ</div>
+                                    <div>Tổng Giá vốn</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card text-white bg-success shadow h-100">
+                                <div class="card-body">
+                                    <div class="fs-3 fw-bold" th:text="${#numbers.formatCurrency(reportData.grossProfit)}">0 VNĐ</div>
+                                    <div>Lợi nhuận gộp</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-4">
+                             <div class="card text-dark bg-light shadow h-100">
+                                <div class="card-body">
+                                    <div class="fs-3 fw-bold" th:text="${reportData.numberOfInvoices}">0</div>
+                                    <div>Số hóa đơn</div>
+                                    <hr>
+                                    <div class="fs-3 fw-bold" th:text="${reportData.numberOfProductsSold}">0</div>
+                                     <div>Sản phẩm đã bán</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <a th:href="@{/reports/financial/export/excel(period=${selectedPeriod}, startDate=${selectedStartDate != null ? #temporals.format(selectedStartDate, 'yyyy-MM-dd') : ''}, endDate=${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''})}" 
+                               class="btn btn-success me-2">
+                                <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+                            </a>
+                            <a th:href="@{/reports/financial/export/pdf(period=${selectedPeriod}, startDate=${selectedStartDate != null ? #temporals.format(selectedStartDate, 'yyyy-MM-dd') : ''}, endDate=${selectedEndDate != null ? #temporals.format(selectedEndDate, 'yyyy-MM-dd') : ''})}" 
+                               class="btn btn-danger">
+                                <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${reportData != null AND reportData.startDate != null}" class="alert alert-info mt-3">
+                    Vui lòng chọn khoảng thời gian để xem báo cáo.
+                </div>
+
+                <h4 class="mt-4 mb-3">Chi tiết bán hàng theo sản phẩm</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên hàng</th>
+                                <th>SKU</th>
+                                <th class="text-end">Tổng số bán ra</th>
+                                <th class="text-end">Thu về (VNĐ)</th>
+                                <th class="text-end">Vốn (VNĐ)</th>
+                                <th class="text-end">Lợi nhuận (VNĐ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="psd, iterStat : ${reportData.productSalesDetails}">
+                                <td th:text="${iterStat.count}"></td> <td th:text="${psd.productName}"></td>
+                                <td th:text="${psd.productSku}"></td>
+                                <td class="text-end" th:text="${psd.quantitySold}"></td>
+                                <td class="text-end" th:text="${#numbers.formatDecimal(psd.totalRevenue, 0, 'COMMA', 0, 'POINT')}"></td>
+                                <td class="text-end" th:text="${#numbers.formatDecimal(psd.totalCost, 0, 'COMMA', 0, 'POINT')}"></td>
+                                <td class="text-end" th:text="${#numbers.formatDecimal(psd.totalProfit, 0, 'COMMA', 0, 'POINT')}"></td>
+                            </tr>
+
+                            <tr th:if="${reportData.productSalesDetails != null AND not #lists.isEmpty(reportData.productSalesDetails)}" 
+                                class="fw-bold table-group-divider">
+                                
+                                <td colspan="4" class="text-end">Tổng cộng:</td> <td class="text-end" 
+                                    th:text="${#numbers.formatDecimal(reportData.sumProductRevenue, 0, 'COMMA', 0, 'POINT')}">
+                                </td>
+                                <td class="text-end" 
+                                    th:text="${#numbers.formatDecimal(reportData.sumProductCost, 0, 'COMMA', 0, 'POINT')}">
+                                </td>
+                                <td class="text-end" 
+                                    th:text="${#numbers.formatDecimal(reportData.sumProductProfit, 0, 'COMMA', 0, 'POINT')}">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div th:fragment="scripts">
+            <script type="text/javascript" th:src="@{/js/script.js}"></script>
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                // Xử lý logic JS cho bộ lọc: Nếu chọn period thì xóa startDate, endDate và ngược lại
+                const periodSelect = document.getElementById('periodSelect');
+                const startDateInput = document.getElementById('startDate');
+                const endDateInput = document.getElementById('endDate');
+
+                if(periodSelect) {
+                    periodSelect.addEventListener('change', function() {
+                        if (this.value !== "") { // Nếu một khoảng thời gian được chọn
+                            if(startDateInput) startDateInput.value = '';
+                            if(endDateInput) endDateInput.value = '';
+                        }
+                    });
+                }
+
+                function clearPeriodIfDatesSelected() {
+                    if(periodSelect && (startDateInput.value || endDateInput.value)) {
+                        periodSelect.value = ""; // Bỏ chọn period nếu nhập ngày cụ thể
+                    }
+                }
+                if(startDateInput) startDateInput.addEventListener('input', clearPeriodIfDatesSelected);
+                if(endDateInput) endDateInput.addEventListener('input', clearPeriodIfDatesSelected);
+                
+                // TODO: Code JavaScript để vẽ biểu đồ nếu có (sử dụng Chart.js)
+                // const reportDataJS = /*[[${reportData}]]*/ null;
+                // if (reportDataJS && reportDataJS.dailyRevenue) { ... vẽ biểu đồ ... }
+                /*]]>*/
+            </script>
+        </div>
+    </div>
+</html>

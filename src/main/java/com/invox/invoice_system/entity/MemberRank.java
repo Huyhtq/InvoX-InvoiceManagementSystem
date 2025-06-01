@@ -1,5 +1,7 @@
 package com.invox.invoice_system.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,12 @@ import lombok.AllArgsConstructor;
 public class MemberRank {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "memberrank_id_seq_gen")
+    @SequenceGenerator(
+        name = "memberrank_id_seq_gen",
+        sequenceName = "MemberRank_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 
@@ -24,7 +31,7 @@ public class MemberRank {
     private Long minTotalPoints; // Sử dụng Long để tương ứng với NUMBER(8,0)
 
     @Column(name = "points_earning_rate", nullable = false, precision = 5, scale = 2)
-    private Double pointsEarningRate; // DECIMAL(5,2) trong DB
+    private BigDecimal pointsEarningRate; // DECIMAL(5,2) trong DB
 
     @Column(name = "description", length = 255)
     private String description;

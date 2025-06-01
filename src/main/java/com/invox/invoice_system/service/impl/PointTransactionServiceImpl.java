@@ -10,7 +10,6 @@ import com.invox.invoice_system.repository.PointTransactionRepository;
 import com.invox.invoice_system.service.PointTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -35,7 +34,7 @@ public class PointTransactionServiceImpl implements PointTransactionService {
     // Sử dụng Propagation.REQUIRES_NEW để đảm bảo giao dịch này luôn được ghi,
     // ngay cả khi giao dịch chính (ví dụ: tạo hóa đơn) bị rollback.
     // Hoặc nếu không cần mức độ đảm bảo cao như vậy, có thể chỉ để @Transactional mặc định.
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void createPointTransaction(Customer customer, Invoice invoice, PointTransactionType type, Long pointsAmount, String description) {
         PointTransaction transaction = new PointTransaction();
         transaction.setCustomer(customer);

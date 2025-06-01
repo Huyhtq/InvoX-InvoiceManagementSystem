@@ -66,7 +66,7 @@ public class CustomerPageController {
 
             model.addAttribute("customer", customerRequestDTO);
             model.addAttribute("genders", Gender.values());
-            return "customers/edit-customer";
+            return "customers/create-customer";
         }
         return "redirect:/customers";
     }
@@ -84,7 +84,7 @@ public class CustomerPageController {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("customer", customerRequestDTO);
             model.addAttribute("genders", Gender.values());
-            return "customers/edit-customer";
+            return "customers/create-customer";
         }
     }
 

@@ -1,5 +1,6 @@
 package com.invox.invoice_system.controller.page;
 
+import com.invox.invoice_system.dto.CategoryDTO;
 import com.invox.invoice_system.dto.ProductRequestDTO;
 import com.invox.invoice_system.dto.ProductResponseDTO;
 import com.invox.invoice_system.enums.ProductStatus;
@@ -23,9 +24,23 @@ public class ProductPageController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public String listProducts(Model model) {
-        List<ProductResponseDTO> products = productService.getAllProducts();
-        model.addAttribute("products", products);
+    public String listProducts(Model model,
+                               @RequestParam(required = false) String searchTerm,
+                               @RequestParam(required = false) ProductStatus status,
+                               @RequestParam(required = false) Long categoryId) {
+        
+        List<ProductResponseDTO> products = productService.searchProducts(searchTerm, status, categoryId);
+        List<CategoryDTO> categories = categoryService.getAllCategories();
+
+        model.addAttribute("productList", products); // Đảm bảo biến này được đưa vào Model
+        model.addAttribute("categories", categories); // Đảm bảo biến này được đưa vào Model
+        model.addAttribute("productStatuses", ProductStatus.values()); // Đảm bảo biến này được đưa vào Model
+
+        // Đảm bảo các tham số tìm kiếm/lọc cũng được đưa vào Model để giữ lại giá trị trên form
+        model.addAttribute("searchTerm", searchTerm);
+        model.addAttribute("status", status);
+        model.addAttribute("categoryId", categoryId);
+
         return "products/list-products";
     }
 
@@ -59,9 +74,11 @@ public class ProductPageController {
         Optional<ProductResponseDTO> productOptional = productService.getProductById(id);
         if (productOptional.isPresent()) {
             ProductResponseDTO productResponseDTO = productOptional.get();
-            // Chuyển từ ProductResponseDTO sang ProductRequestDTO để đổ vào form
-            // Trong thực tế, bạn có thể tạo một ProductUpdateRequestDTO hoặc dùng ProductRequestDTO với MapStruct
+            
+            // Ánh xạ ProductResponseDTO sang ProductRequestDTO để đổ vào form
+            // ProductRequestDTO của bạn đã có trường 'id'
             ProductRequestDTO productRequestDTO = new ProductRequestDTO();
+            productRequestDTO.setId(productResponseDTO.getId()); // Gán ID
             productRequestDTO.setName(productResponseDTO.getName());
             productRequestDTO.setPrice(productResponseDTO.getPrice());
             productRequestDTO.setCostPrice(productResponseDTO.getCostPrice());
@@ -72,12 +89,12 @@ public class ProductPageController {
             productRequestDTO.setStatus(productResponseDTO.getStatus());
             productRequestDTO.setCategoryId(productResponseDTO.getCategory() != null ? productResponseDTO.getCategory().getId() : null);
 
-            model.addAttribute("product", productRequestDTO);
-            model.addAttribute("categories", categoryService.getAllCategories());
-            model.addAttribute("productStatuses", ProductStatus.values());
-            return "products/edit-product";
+            model.addAttribute("product", productRequestDTO); // <-- product.id sẽ KHÔNG null
+            model.addAttribute("categories", categoryService.getAllCategories()); // Cần danh sách danh mục
+            model.addAttribute("productStatuses", ProductStatus.values()); // Cần các trạng thái
+            return "products/create-product"; // Hoặc "products/create-product" nếu muốn dùng chung tên view
         }
-        return "redirect:/products";
+        return "redirect:/products"; // Chuyển hướng nếu không tìm thấy sản phẩm
     }
 
     @PostMapping("/edit/{id}")
@@ -91,10 +108,10 @@ public class ProductPageController {
             return "redirect:/products";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("product", productRequestDTO);
-            model.addAttribute("categories", categoryService.getAllCategories());
-            model.addAttribute("productStatuses", ProductStatus.values());
-            return "products/edit-product";
+            model.addAttribute("product", productRequestDTO); // Giữ lại dữ liệu đã nhập
+            model.addAttribute("categories", categoryService.getAllCategories()); // THÊM LẠI để form có dropdown
+            model.addAttribute("productStatuses", ProductStatus.values()); // THÊM LẠI để form có dropdown
+            return "products/create-product"; // Trả về lại form khi có lỗi
         }
     }
 

@@ -1,17 +1,27 @@
--- Drop existing tables with CASCADE CONSTRAINTS (for development, not production)
-/*
+-- Drop tables in reverse order of creation (dependent tables first)
 DROP TABLE History CASCADE CONSTRAINTS;
 DROP TABLE PointTransaction CASCADE CONSTRAINTS;
 DROP TABLE InvoiceDetail CASCADE CONSTRAINTS;
 DROP TABLE Invoice CASCADE CONSTRAINTS;
 DROP TABLE AppUser CASCADE CONSTRAINTS;
 DROP TABLE Employee CASCADE CONSTRAINTS;
-DROP TABLE Role CASCADE CONSTRAINTS;
 DROP TABLE Customer CASCADE CONSTRAINTS;
 DROP TABLE MemberRank CASCADE CONSTRAINTS;
 DROP TABLE Product CASCADE CONSTRAINTS;
 DROP TABLE Category CASCADE CONSTRAINTS;
-*/
+DROP TABLE Role CASCADE CONSTRAINTS;
+
+DROP SEQUENCE Category_SEQ;
+DROP SEQUENCE Product_SEQ;
+DROP SEQUENCE MemberRank_SEQ;
+DROP SEQUENCE Customer_SEQ;
+DROP SEQUENCE Role_SEQ;
+DROP SEQUENCE Employee_SEQ;
+DROP SEQUENCE AppUser_SEQ;
+DROP SEQUENCE Invoice_SEQ;
+DROP SEQUENCE InvoiceDetail_SEQ;
+DROP SEQUENCE PointTransaction_SEQ;
+DROP SEQUENCE History_SEQ;
 
 -- Create table Category
 CREATE TABLE Category (
@@ -23,6 +33,7 @@ CREATE TABLE Category (
 -- Create table Product
 CREATE TABLE Product (
     id NUMBER(5, 0) PRIMARY KEY,
+    sku VARCHAR2(50) NOT NULL UNIQUE,
     name VARCHAR2(100) NOT NULL,
     price NUMBER(12, 0) NOT NULL, -- Giá bán
     cost_price NUMBER(12, 0),    -- Giá nhập (để tính lợi nhuận)
@@ -68,36 +79,36 @@ CREATE TABLE Customer (
 -- Create table Role
 CREATE TABLE Role (
     id NUMBER(3, 0) PRIMARY KEY,
-    name VARCHAR2(30) NOT NULL UNIQUE -- Tên vai trò duy nhất
+    name VARCHAR2(30) NOT NULL UNIQUE
 );
 
 -- Create table Employee
 CREATE TABLE Employee (
     id NUMBER(12, 0) PRIMARY KEY,
-    name VARCHAR2(100) NOT NULL, -- Tăng kích thước tên
+    name VARCHAR2(100) NOT NULL, 
     phone VARCHAR2(15) UNIQUE,
     email VARCHAR2(100) UNIQUE,
     address VARCHAR2(255),
     position VARCHAR2(50),
     hire_date DATE DEFAULT SYSDATE NOT NULL,
     termination_date DATE,
-    is_active CHAR(1) DEFAULT 'Y' NOT NULL, -- 'Y' hoặc 'N'
+    is_active VARCHAR2(10) DEFAULT 'ACTIVE' NOT NULL, -- 'ACTIVE' hoặc 'INACTIVE'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT chk_employee_is_active CHECK (is_active IN ('Y', 'N'))
+    CONSTRAINT chk_employee_is_active CHECK (is_active IN ('ACTIVE', 'INACTIVE'))
 );
 
--- Create table AppUser (for login)
+-- Create table App_User (for login)
 CREATE TABLE AppUser (
     id NUMBER(8, 0) PRIMARY KEY,
     username VARCHAR2(30) NOT NULL UNIQUE,
-    password VARCHAR2(255) NOT NULL, -- Đủ lớn cho mật khẩu đã băm (BCrypt)
+    password VARCHAR2(255) NOT NULL, 
     employee_id NUMBER(12, 0) UNIQUE, -- Một nhân viên chỉ có một tài khoản user
     role_id NUMBER(3, 0) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_appuser_employee FOREIGN KEY (employee_id) REFERENCES Employee(id),
-    CONSTRAINT fk_appuser_role FOREIGN KEY (role_id) REFERENCES Role(id)
+    CONSTRAINT fk_app_user_employee FOREIGN KEY (employee_id) REFERENCES Employee(id),
+    CONSTRAINT fk_app_user_role FOREIGN KEY (role_id) REFERENCES Role(id)
 );
 
 -- Create table Invoice
@@ -162,3 +173,36 @@ CREATE TABLE History (
     detail_json CLOB,                     -- Lưu trữ chi tiết thay đổi (JSON)
     CONSTRAINT fk_history_user FOREIGN KEY (user_id) REFERENCES AppUser(id)
 );
+
+-- Sequence cho bảng Category (ví dụ)
+CREATE SEQUENCE Category_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng Product
+CREATE SEQUENCE Product_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng MemberRank
+CREATE SEQUENCE MemberRank_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng Customer
+CREATE SEQUENCE Customer_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng Role
+CREATE SEQUENCE Role_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng Employee
+CREATE SEQUENCE Employee_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng AppUser
+CREATE SEQUENCE AppUser_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng Invoice
+CREATE SEQUENCE Invoice_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng InvoiceDetail
+CREATE SEQUENCE InvoiceDetail_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng PointTransaction
+CREATE SEQUENCE PointTransaction_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+-- Sequence cho bảng History
+CREATE SEQUENCE History_SEQ START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;

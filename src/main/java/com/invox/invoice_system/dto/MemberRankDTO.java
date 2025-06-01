@@ -1,5 +1,7 @@
 package com.invox.invoice_system.dto;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,6 @@ public class MemberRankDTO {
     private Long id;
     private String name;
     private Long minTotalPoints;
-    private Double pointsEarningRate;
+    private BigDecimal pointsEarningRate;
     private String description;
 }

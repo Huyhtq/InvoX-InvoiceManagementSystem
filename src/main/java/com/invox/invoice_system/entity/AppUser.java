@@ -17,7 +17,12 @@ import java.time.LocalDateTime;
 public class AppUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Hoặc GenerationType.SEQUENCE cho Oracle
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "appuser_id_seq_gen") 
+    @SequenceGenerator(
+        name = "appuser_id_seq_gen",
+        sequenceName = "AppUser_SEQ",
+        allocationSize = 1
+    )
     @Column(name = "id")
     private Long id;
 
