@@ -2,55 +2,80 @@ package com.invox.invoice_system.service.impl;
 
 import com.invox.invoice_system.dto.CategoryDTO;
 import com.invox.invoice_system.entity.Category;
+import com.invox.invoice_system.mapper.CategoryMapper;
 import com.invox.invoice_system.repository.CategoryRepository;
-import com.invox.invoice_system.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.invox.invoice_system.service.CategoryService; 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Service
-public class CategoryServiceImpl implements CategoryService {
+@Service 
+@RequiredArgsConstructor 
+public class CategoryServiceImpl implements CategoryService { 
 
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Override
-    public CategoryDTO createCategory(CategoryDTO dto) {
-        Category category = Category.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .build();
-        return mapToDTO(categoryRepository.save(category));
-    }
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @Override
-    public CategoryDTO getCategoryById(Integer id) {
-        return categoryRepository.findById(id)
-                .map(this::mapToDTO)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-    }
-
-    @Override
+    @Transactional(readOnly = true) // Đánh dấu giao dịch chỉ đọc
     public List<CategoryDTO> getAllCategories() {
-        return categoryRepository.findAll()
-                .stream().map(this::mapToDTO).toList();
+        return categoryRepository.findAll().stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public CategoryDTO updateCategory(Integer id, CategoryDTO dto) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-        category.setName(dto.getName());
-        return mapToDTO(categoryRepository.save(category));
+    @Transactional(readOnly = true)
+    public Optional<CategoryDTO> getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .map(categoryMapper::toDto);
     }
 
     @Override
-    public void deleteCategory(Integer id) {
+    @Transactional // Đánh dấu giao dịch ghi
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
+        // Ví dụ: Kiểm tra tên danh mục duy nhất
+        if (categoryRepository.findByName(categoryDTO.getName()).isPresent()) {
+            throw new IllegalArgumentException("Tên danh mục đã tồn tại: " + categoryDTO.getName());
+        }
+        Category category = categoryMapper.toEntity(categoryDTO);
+        Category savedCategory = categoryRepository.save(category);
+        return categoryMapper.toDto(savedCategory);
+    }
+
+    @Override
+    @Transactional
+    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
+        Category existingCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục với ID: " + id));
+
+        // Kiểm tra tên duy nhất khi cập nhật (ngoại trừ chính danh mục đang cập nhật)
+        Optional<Category> categoryWithName = categoryRepository.findByName(categoryDTO.getName());
+        if (categoryWithName.isPresent() && !categoryWithName.get().getId().equals(id)) {
+            throw new IllegalArgumentException("Tên danh mục đã tồn tại: " + categoryDTO.getName());
+        }
+
+        existingCategory.setName(categoryDTO.getName());
+        existingCategory.setDescription(categoryDTO.getDescription());
+
+        Category updatedCategory = categoryRepository.save(existingCategory);
+        return categoryMapper.toDto(updatedCategory);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCategory(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new IllegalArgumentException("Không tìm thấy danh mục với ID: " + id);
+        }
+        // Thêm logic kiểm tra nếu có sản phẩm liên quan trước khi xóa
+        // if (productRepository.countByCategoryId(id) > 0) {
+        //     throw new IllegalStateException("Không thể xóa danh mục khi còn sản phẩm liên quan.");
+        // }
         categoryRepository.deleteById(id);
-    }
-
-    private CategoryDTO mapToDTO(Category category) {
-        return new CategoryDTO(category.getId(), category.getName());
     }
 }

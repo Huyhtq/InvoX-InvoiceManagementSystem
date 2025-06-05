@@ -1,13 +1,23 @@
 package com.invox.invoice_system.dto;
 
-import lombok.*;
+import com.invox.invoice_system.enums.ProductStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProductRequestDTO {
+    private Long id;
+    private String sku;
     private String name;
     private Long price;
-    private Integer quantity;
-    private Integer categoryId;
+    private Long costPrice;
+    private Long quantity;
+    private Long categoryId; // Chỉ cần ID để liên kết
+    private String brand;
+    private String imageUrl;
+    private String description;
+    private ProductStatus status;
 }

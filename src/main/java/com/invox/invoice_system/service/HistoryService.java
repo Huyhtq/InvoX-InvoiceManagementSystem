@@ -1,17 +1,15 @@
 package com.invox.invoice_system.service;
 
-import com.invox.invoice_system.dto.HistoryRequestDTO;
 import com.invox.invoice_system.dto.HistoryResponseDTO;
+import com.invox.invoice_system.entity.AppUser;
+import com.invox.invoice_system.enums.HistoryAction;
 
 import java.util.List;
-import java.sql.Timestamp;
 
 public interface HistoryService {
-    HistoryResponseDTO createHistory(HistoryRequestDTO dto);
-    List<HistoryResponseDTO> getAllHistories();
-    HistoryResponseDTO getHistoryById(Long id);
-    void deleteHistory(Long id);
-    List<HistoryResponseDTO> getHistoriesBetween(Timestamp from, Timestamp to);
-    List<HistoryResponseDTO> getHistoriesAfter(Timestamp from);
-    List<HistoryResponseDTO> getHistoriesBefore(Timestamp to);
+    List<HistoryResponseDTO> getAllHistoryRecords();
+    List<HistoryResponseDTO> getHistoryByUserId(Long userId);
+    List<HistoryResponseDTO> getHistoryByTarget(String targetType, Long targetId);
+    // Phương thức nội bộ, không phải public API
+    void logAction(AppUser user, HistoryAction action, String targetType, Long targetId, String detailJson);
 }

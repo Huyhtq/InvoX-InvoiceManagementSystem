@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div th:replace="layout :: layout">
+    <div th:fragment="content">
+      <div class="container-fluid p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h1 class="h3 mb-0 text-dark">Member Rank Management</h1>
+            <p class="text-muted">Define customer loyalty levels</p>
+          </div>
+          <div class="d-flex align-items-center">
+            <a th:href="@{/member-ranks/new}" class="btn btn-success">
+              <i class="bi bi-plus-circle me-1"></i> Add Member Rank
+            </a>
+          </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+          <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+          <span th:text="${errorMessage}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+          <span th:text="${error}"></span>
+        </div>
+
+        <div class="card">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <h5 class="card-title mb-0">Member Rank List</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="py-3 ps-4">ID</th>
+                    <th class="py-3">Rank Name</th>
+                    <th class="py-3">Minimum Points</th>
+                    <th class="py-3">Points Earning Rate (%)</th>
+                    <th class="py-3">Description</th>
+                    <th class="py-3 text-end pe-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="rank : ${memberRanks}">
+                    <td class="ps-4" th:text="${rank.id}">1</td>
+                    <td th:text="${rank.name}">BRONZE</td>
+                    <td th:text="${rank.minTotalPoints}">0</td>
+                    <td
+                      th:text="${#numbers.formatDecimal(rank.pointsEarningRate * 100, 0, 'COMMA', 2, 'POINT') + '%'}"
+                    >
+                      1.00%
+                    </td>
+                    <td th:text="${rank.description}">Bronze Rank</td>
+                    <td class="text-end pe-4">
+                      <div class="btn-group">
+                        <a
+                          th:href="@{/member-ranks/edit/{id}(id=${rank.id})}"
+                          class="btn btn-sm btn-outline-secondary"
+                          title="Edit"
+                        >
+                          <i class="bi bi-pencil"></i>
+                        </a>
+                        <form
+                          th:action="@{/member-ranks/delete/{id}(id=${rank.id})}"
+                          method="post"
+                          onsubmit="return confirm('Are you sure you want to delete this member rank?');"
+                        >
+                          <button
+                            type="submit"
+                            class="btn btn-sm btn-outline-danger"
+                            title="Delete"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr th:if="${#lists.isEmpty(memberRanks)}">
+                    <td colspan="6" class="text-center py-4">
+                      <i class="bi bi-inbox fs-1 text-muted"></i>
+                      <p class="mt-2 mb-0">No member ranks found</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-muted"
+                  >Showing
+                  <span th:text="${#lists.size(memberRanks)}">0</span>
+                  entries</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:fragment="scripts">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js"></script>
+      <script type="text/javascript" th:src="@{/js/products.js}"></script>
+      <script src="https://code.iconify.design/3/3.0.1/iconify.min.js"></script>
+    </div>
+  </div>
+</html>

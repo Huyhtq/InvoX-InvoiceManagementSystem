@@ -4,11 +4,13 @@ import com.invox.invoice_system.dto.EmployeeRequestDTO;
 import com.invox.invoice_system.dto.EmployeeResponseDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeService {
-    EmployeeResponseDTO createEmployee(EmployeeRequestDTO dto);
-    EmployeeResponseDTO getEmployeeById(Long id);
     List<EmployeeResponseDTO> getAllEmployees();
-    EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO dto);
+    Optional<EmployeeResponseDTO> getEmployeeById(Long id);
+    EmployeeResponseDTO createEmployee(EmployeeRequestDTO employeeRequestDTO);
+    EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO employeeRequestDTO);
     void deleteEmployee(Long id);
+    EmployeeResponseDTO deactivateEmployee(Long employeeId);
 }
