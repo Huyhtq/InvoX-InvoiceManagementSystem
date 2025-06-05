@@ -1,0 +1,163 @@
+/* --- App Container --- */
+.app-container {
+    width: 100%;
+    min-height: 100vh;
+    /* display: flex;*/
+}
+
+/* --- Sidebar styles --- */
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: var(--sidebar-bg);
+    transition: margin-left 0.3s ease-in-out;
+    z-index: 1050;
+    /* Bootstrap classes: d-flex flex-column flex-shrink-0 text-white */
+}
+
+#sidebar .sidebar-brand-container {
+    padding: 0.75rem 1rem;
+    /* Bootstrap classes: d-flex align-items-center */
+}
+
+/* #sidebar .sidebar-brand-container .brand-group {
+    Bootstrap classes: d-flex align-items-center me-auto
+} */
+
+#sidebar .sidebar-brand-container .brand-group img {
+    height: 32px; /* Hoặc 40px như cũ */
+}
+
+/* #sidebar .sidebar-brand-container .brand-group .app-name .bold {
+    Style cho chữ X nếu cần
+} */
+
+#sidebar hr.sidebar-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+#sidebar ul.sidebar-nav-scroll {
+    list-style: none;
+    padding-left: 0; 
+    margin-bottom: auto !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-grow: 1;
+    min-height: 0;
+    /* Bootstrap class px-2 đã có trên ul */
+}
+
+#sidebar .nav-item {
+    width: 100%;
+}
+
+#sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: var(--sidebar-text-color);
+    text-decoration: none;
+    border-radius: 0.375rem;
+    margin-bottom: 2px;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    /* padding py-3 (1rem top/bottom) và px-2 (0.5rem left/right trên ul) đã có từ HTML/Bootstrap */
+    /* Nếu cần padding cụ thể cho link, ví dụ: padding: 0.875rem 0.5rem; (do ul đã có px-2) */
+}
+
+#sidebar .nav-link:hover {
+    color: var(--sidebar-text-hover-color);
+    background-color: var(--sidebar-active-bg);
+}
+
+#sidebar .nav-link.active, 
+#sidebar .sidebar-link.active { 
+    color: var(--sidebar-text-hover-color) !important; 
+    background-color: var(--sidebar-active-bg);
+    border-left: 4px solid var(--sidebar-active-border-color);
+    /* padding-left sẽ bị ảnh hưởng bởi border, điều chỉnh nếu cần: */
+    /* padding-left: calc(0.5rem - 4px + padding-left-của-ul-nếu-có); */
+}
+
+#sidebar .nav-link iconify-icon {
+    margin-right: 0.875rem;
+    flex-shrink: 0;
+}
+
+#sidebar .nav-link .nav-link-text {
+    flex-grow: 1; 
+    min-width: 0; 
+}
+
+/* Scrollbar styling */
+#sidebar ul.sidebar-nav-scroll::-webkit-scrollbar { width: 6px; }
+#sidebar ul.sidebar-nav-scroll::-webkit-scrollbar-track { background: transparent; }
+#sidebar ul.sidebar-nav-scroll::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.25); border-radius: 10px; }
+#sidebar ul.sidebar-nav-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.4); }
+
+/* Sidebar dropdown (non-Bootstrap) styles from your theme */
+#sidebar ul li label i:first-child { /* Cẩn thận với selector này nếu ul.sidebar-nav-scroll cũng là ul li */
+  color: rgb(119, 119, 119);
+}
+#sidebar input[name="menu"],
+#sidebar input[name=dropdowns] {
+  display: none;
+}
+/* ... (rest of your custom radio/checkbox dropdown styles, prefixed with #sidebar if they are specific to it) ... */
+#sidebar .main { 
+  list-style-type: none;
+  padding-left: 0;
+}
+#sidebar .drop {
+  display: none;
+}
+#sidebar .drop li {
+  margin-left: 20px;
+}
+#sidebar .drop li label {
+  width: 105px;
+}
+
+
+/* --- Content Area --- */
+#content {
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  min-height: 100vh;
+  transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out; /* Sửa transition */
+  background-color: #F4F4F4; /* Đặt màu nền cho content nếu body không đủ */
+}
+
+/* Khi sidebar ẩn (cho mobile hoặc toggle) */
+#sidebar.collapsed + #content, /* Nếu dùng class .collapsed để ẩn sidebar */
+body.sidebar-collapsed #content { /* Nếu class .sidebar-collapsed trên body */
+  width: 100%;
+  margin-left: 0;
+}
+
+/* --- Topbar --- */
+#topbar { /* Bootstrap class navbar navbar-expand-lg navbar-light bg-light border-bottom */
+  height: var(--topbar-height);
+  box-shadow: 0 0.125rem 0.625rem rgba(90, 97, 105, 0.1); /* Giữ lại shadow */
+  /* position: sticky; top: 0; z-index: 1020; Nếu muốn topbar dính */
+}
+
+/* Topbar user info */
+#topbar .header-right {
+  text-align: right; 
+}
+#topbar .user-name {
+  font-size: 1rem; /* Điều chỉnh lại cho phù hợp với topbar */
+  font-weight: 600; 
+}
+#topbar .user-title {
+  font-size: 0.8rem; 
+  color: var(--bs-secondary); 
+}
