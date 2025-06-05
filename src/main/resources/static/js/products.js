@@ -1,58 +1,149 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log("products.js loaded");
+    console.log("products.js loaded for product form interaction");
 
-    // Toggle sidebar
+    // --- CÁC THÀNH PHẦN LIÊN QUAN ĐẾN FORM SẢN PHẨM ---
+    const categorySelect = document.getElementById('categorySelect');
+    const skuInput = document.getElementById('skuInput');
+    const productForm = document.getElementById('productForm'); // Để xác định action của form
+
+    // Biến 'productId' được truyền từ Thymeleaf thông qua một thẻ script inline.
+    // Ví dụ: <script th:inline="javascript"> const productId = /*[[${product?.id}]]*/ null; </script>
+    // Phải đảm bảo biến 'productId' này đã được định nghĩa TRƯỚC KHI file products.js được load.
+    // Nếu 'productId' không được định nghĩa toàn cục theo cách trên, cần tìm cách khác để lấy.
+    // Hiện tại, chúng ta sẽ giả định 'productId' đã tồn tại trong scope global từ HTML.
+    
+    let isEditMode = false;
+    if (typeof productId !== 'undefined' && productId !== null) {
+        isEditMode = true;
+    } else if (productForm) { 
+        // Fallback: Kiểm tra action của form nếu productId không có sẵn (ít tin cậy hơn)
+        const formAction = productForm.getAttribute('action');
+        if (formAction && formAction.includes('/edit/')) {
+            isEditMode = true;
+        }
+    }
+
+    console.log("Product Form - Edit Mode:", isEditMode, "(Based on productId:", (typeof productId !== 'undefined' ? productId : 'not defined'), "or form action)");
+
+    /**
+     * Hàm gọi API để lấy SKU gợi ý và cập nhật vào ô input.
+     */
+    function fetchAndSetSku() {
+        // Đảm bảo categorySelect tồn tại trước khi truy cập 'value'
+        if (!categorySelect) {
+            console.warn("Category select element not found.");
+            return;
+        }
+        const categoryId = categorySelect.value;
+
+        // Chỉ tự động điền/thay đổi SKU khi:
+        // 1. Đang ở chế độ tạo mới (!isEditMode)
+        // 2. Đã chọn một category hợp lệ (categoryId có giá trị)
+        if (categoryId && !isEditMode) {
+            console.log("Fetching SKU for categoryId:", categoryId);
+            // Đảm bảo URL API endpoint là chính xác
+            fetch(`/api/products/suggest-sku?categoryId=${categoryId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        // Nếu server trả về lỗi, cố gắng đọc text lỗi và ném ra Error
+                        return response.text().then(text => {
+                            console.error("Server error response for SKU suggestion:", text);
+                            throw new Error(text || 'Error fetching SKU suggestion from server. Status: ' + response.status);
+                        });
+                    }
+                    return response.text(); // API trả về SKU dưới dạng text thuần
+                })
+                .then(suggestedSku => {
+                    console.log("Suggested SKU received:", suggestedSku);
+                    if (skuInput) {
+                        skuInput.value = suggestedSku;
+                    } else {
+                        console.warn("SKU input element not found.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during fetchAndSetSku:', error.message);
+                    if (skuInput) {
+                        skuInput.value = ''; // Xóa SKU nếu có lỗi
+                    }
+                    // Cân nhắc hiển thị thông báo lỗi này cho người dùng nếu cần,
+                    // ví dụ thông qua một div thông báo trên form.
+                    // alert('Could not suggest SKU: ' + error.message);
+                });
+        } else if (!categoryId && !isEditMode && skuInput) {
+            // Nếu không chọn category (và đang ở mode tạo mới), xóa SKU
+            console.log("No category selected in new mode, clearing SKU.");
+            skuInput.value = '';
+        } else if (isEditMode) {
+            console.log("In edit mode, SKU auto-fill is disabled on category change.");
+        }
+    }
+
+    // Gắn sự kiện và kiểm tra khi DOM đã sẵn sàng
+    if (categorySelect && skuInput) {
+        // Lắng nghe sự kiện thay đổi lựa chọn category
+        categorySelect.addEventListener('change', fetchAndSetSku);
+
+        // Xử lý khi trang được load (đặc biệt quan trọng khi form load lại sau lỗi validation ở chế độ tạo mới):
+        // Nếu không phải edit mode VÀ đã có một category được chọn sẵn (ví dụ từ giá trị th:field)
+        if (!isEditMode && categorySelect.value) {
+            console.log("Initial SKU fetch on page load for new product with category pre-selected:", categorySelect.value);
+            fetchAndSetSku(); // Gọi để điền SKU nếu category đã được chọn sẵn
+        }
+    } else {
+        if (!categorySelect) console.warn("Element with ID 'categorySelect' not found. SKU auto-fill on category change will not work.");
+        if (!skuInput) console.warn("Element with ID 'skuInput' not found. SKU auto-fill will not work.");
+    }
+
+    // --- CÁC CHỨC NĂNG KHÁC CHO TRANG PRODUCT (NẾU CÓ) ---
+    // Ví dụ: Toggle sidebar, chuyển đổi view table/grid, filter UI (nếu có trên trang form này)
+    // Lưu ý: Các chức năng này có thể nằm ở file JS chung nếu được sử dụng ở nhiều trang.
+
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebarClose = document.getElementById('sidebarclose');
     const sidebar = document.getElementById('sidebar');
-    const content = document.getElementById('content');
+    const content = document.getElementById('content'); // Giả sử #content là vùng nội dung chính
+
+    function toggleSidebar() {
+        if (sidebar && content) {
+            sidebar.classList.toggle('hidden'); // Giả sử 'hidden' là class để ẩn sidebar
+            content.classList.toggle('expanded'); // Giả sử 'expanded' là class cho content khi sidebar ẩn
+            console.log("Sidebar toggled. Sidebar hidden:", sidebar.classList.contains('hidden'));
+        } else {
+            if (!sidebar) console.warn("Sidebar element not found for toggle.");
+            if (!content) console.warn("Content element not found for toggle.");
+        }
+    }
 
     if (sidebarToggle) {
-        console.log("Sidebar toggle found");
-        sidebarToggle.addEventListener('click', function () {
-            console.log("Toggle clicked");
-            sidebar.classList.toggle('hidden');
-            content.classList.toggle('expanded');
-        });
-    } else {
-        console.log("Sidebar toggle NOT found");
+        sidebarToggle.addEventListener('click', toggleSidebar);
     }
-
     if (sidebarClose) {
-        console.log("Sidebar close found");
-        sidebarClose.addEventListener('click', function () {
-            console.log("Close clicked");
-            sidebar.classList.toggle('hidden');
-            content.classList.toggle('expanded');
-        });
-    } else {
-        console.log("Sidebar close NOT found");
+        sidebarClose.addEventListener('click', toggleSidebar);
     }
 
-    // Make sidebar links active
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        link.addEventListener('click', function () {
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
+    // Make sidebar links active based on current path
+    // (Phần này phù hợp hơn nếu products.js là script chung cho nhiều trang có sidebar)
+    try {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
         });
-    });
+    } catch (e) {
+        console.warn("Error setting active sidebar link:", e);
+    }
 
-    const path = window.location.pathname;
-
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        // So sánh đường dẫn hiện tại với href của từng link
-        if (link.getAttribute('href') === path) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
-
-    // --- 1. Chức năng chuyển đổi giữa Table View và Grid View ---
+    // --- Chức năng chuyển đổi giữa Table View và Grid View (nếu có trên trang này) ---
+    // Thông thường chức năng này ở trang danh sách sản phẩm, không phải trang form.
+    // Nếu bạn có nó ở đây, hãy đảm bảo các element tồn tại.
     const tableViewBtn = document.getElementById('tableViewBtn');
     const gridViewBtn = document.getElementById('gridViewBtn');
-    const tableResponsive = document.querySelector('.table-responsive'); // Chứa bảng
-    const gridView = document.querySelector('.grid-view'); // Chứa chế độ lưới
+    const tableResponsive = document.querySelector('.table-responsive');
+    const gridView = document.querySelector('.grid-view');
 
     if (tableViewBtn && gridViewBtn && tableResponsive && gridView) {
         tableViewBtn.addEventListener('click', function () {
@@ -70,47 +161,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- 2. Chức năng tìm kiếm và lọc (tương tác UI) ---
-    // (Lưu ý: Logic lọc thực tế sẽ được xử lý ở ProductPageController khi form được gửi)
-    // Script này chỉ là để hiển thị trạng thái đã chọn trên dropdown
-    const searchInput = document.getElementById('searchInput');
+    // --- Xử lý hiển thị lại filter (nếu có trên trang form) ---
+    // Thông thường chức năng này ở trang danh sách sản phẩm.
     const statusFilter = document.getElementById('statusFilter');
-    const categoryFilter = document.getElementById('categoryFilter');
-
-    // Nếu có giá trị searchTerm từ server (th:value="${searchTerm}"), giữ nó trong input
-    // Nếu có giá trị status từ server, chọn option tương ứng
-    if (statusFilter) {
-        const selectedStatus = statusFilter.dataset.selectedStatus; // Giả sử bạn thêm dataset attribute trong Thymeleaf
-        if (selectedStatus) {
-            statusFilter.value = selectedStatus;
-        }
+    if (statusFilter && statusFilter.dataset.selectedStatus) {
+        statusFilter.value = statusFilter.dataset.selectedStatus;
     }
 
-    // Nếu có giá trị categoryId từ server, chọn option tương ứng
-    if (categoryFilter) {
-        const selectedCategoryId = categoryFilter.dataset.selectedCategoryId; // Giả sử bạn thêm dataset attribute
-        if (selectedCategoryId) {
-            categoryFilter.value = selectedCategoryId;
-        }
+    const categoryFilterForList = document.getElementById('categoryFilter'); // Đổi tên để tránh trùng
+    if (categoryFilterForList && categoryFilterForList.dataset.selectedCategoryId) {
+        categoryFilterForList.value = categoryFilterForList.dataset.selectedCategoryId;
     }
 
-    // Bạn có thể thêm các chức năng JavaScript phức tạp hơn tại đây,
-    // ví dụ như gửi yêu cầu AJAX để lọc/tìm kiếm mà không cần tải lại trang.
-    // Tuy nhiên, với thiết kế hiện tại (form submit GET), điều đó chưa cần thiết.
-
-    // --- 3. Xử lý thông báo thành công/lỗi từ RedirectAttributes (nếu có) ---
-    // Spring Boot với RedirectAttributes thêm các flash attributes vào Model,
-    // nhưng chúng có thể không được hiển thị trực tiếp nếu không có logic JS.
-    // Đây là một ví dụ đơn giản để hiển thị chúng.
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('successMessage')) {
-        alert(urlParams.get('successMessage'));
-        // Xóa tham số khỏi URL sau khi hiển thị
-        window.history.replaceState(null, null, window.location.pathname);
-    }
-    if (urlParams.has('errorMessage')) {
-        alert(urlParams.get('errorMessage'));
-        // Xóa tham số khỏi URL sau khi hiển thị
-        window.history.replaceState(null, null, window.location.pathname);
-    }
 });

@@ -241,4 +241,18 @@ public class CustomerServiceImpl implements CustomerService {
         }
         customerRepository.save(customer);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CustomerResponseDTO> searchCustomersByNameOrPhone(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return List.of();
+        }
+
+        List<Customer> foundCustomers = customerRepository.findTop10ByNameContainingIgnoreCaseOrPhoneContaining(searchTerm.trim(), searchTerm.trim());
+
+        return foundCustomers.stream()
+                             .map(customerMapper::toResponseDto)
+                             .collect(Collectors.toList());
+    }
 }

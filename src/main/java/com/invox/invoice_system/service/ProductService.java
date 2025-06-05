@@ -16,4 +16,5 @@ public interface ProductService {
     List<ProductResponseDTO> searchProducts(String searchTerm, ProductStatus status, Long categoryId);
     ProductResponseDTO updateProductQuantity(Long productId, Long quantityChange);
     List<ProductResponseDTO> searchProductsByTerm(String searchTerm);
+    String suggestSkuForCategory(Long categoryId);
 }

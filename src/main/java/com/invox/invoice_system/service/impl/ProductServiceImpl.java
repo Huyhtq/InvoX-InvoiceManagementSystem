@@ -8,10 +8,14 @@ import com.invox.invoice_system.enums.ProductStatus;
 import com.invox.invoice_system.mapper.ProductMapper;
 import com.invox.invoice_system.repository.CategoryRepository;
 import com.invox.invoice_system.repository.ProductRepository;
+import com.invox.invoice_system.service.CategoryService;
 import com.invox.invoice_system.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +28,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository; // Cần để kiểm tra categoryId
     private final ProductMapper productMapper;
-
+    private final CategoryService categoryService;
+    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponseDTO> getAllProducts() {
@@ -163,5 +168,53 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findByNameContainingIgnoreCaseOrSkuContainingIgnoreCase(searchTerm, searchTerm).stream()
             .map(productMapper::toResponseDto)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String suggestSkuForCategory(Long categoryId) {
+        logger.info("Attempting to suggest SKU for categoryId: {}", categoryId);
+        if (categoryId == null) {
+            throw new IllegalArgumentException("Category ID không được để trống để tạo SKU.");
+        }
+
+        // Lấy mã code của Category từ CategoryService
+        String categoryCode = categoryService.getCategoryCodeById(categoryId)
+                .filter(StringUtils::hasText) // Đảm bảo code không rỗng
+                .orElseThrow(() -> {
+                    logger.warn("Không thể tìm thấy mã code hợp lệ cho category ID: {}", categoryId);
+                    return new IllegalArgumentException("Không tìm thấy mã code hợp lệ cho danh mục đã chọn (ID: " + categoryId + ")");
+                });
+
+        logger.debug("Category code for ID {}: {}", categoryId, categoryCode);
+
+        // Lựa chọn logic tính số thứ tự tiếp theo:
+
+        // === LỰA CHỌN 1: Dựa vào trường 'total' trong Category (nếu bạn duy trì nó) ===
+        // int currentTotal = categoryService.getCategoryTotalProducts(categoryId).orElse(0);
+        // long nextSkuNumber = currentTotal + 1;
+        // logger.debug("Next SKU number based on category total ({}): {}", currentTotal, nextSkuNumber);
+
+        // === LỰA CHỌN 2: Tính động dựa trên SKU lớn nhất hiện có (khuyến nghị nếu 'total' khó duy trì chính xác) ===
+        String upperCategoryCode = categoryCode.toUpperCase();
+        long currentMaxSkuNumber = productRepository.findAll().stream()
+            .map(Product::getSku)
+            .filter(sku -> sku != null && sku.toUpperCase().startsWith(upperCategoryCode))
+            .map(sku -> sku.substring(upperCategoryCode.length())) // Lấy phần số ví dụ "001", "006"
+            .filter(numStr -> numStr.matches("\\d+"))      // Chỉ lấy các chuỗi là số
+            .mapToLong(Long::parseLong)                           // Chuyển sang long
+            .max()                                                // Tìm số lớn nhất
+            .orElse(0L);                                      // Nếu chưa có sản phẩm nào, bắt đầu từ 0
+        long nextSkuNumber = currentMaxSkuNumber + 1;
+        logger.debug("Next SKU number based on dynamic count (max existing {}): {}", currentMaxSkuNumber, nextSkuNumber);
+        // === KẾT THÚC LỰA CHỌN 2 ===
+
+
+        // Định dạng số thứ tự thành 3 chữ số, ví dụ: 7 -> "007", 12 -> "012", 123 -> "123"
+        String formattedSkuNumber = String.format("%03d", nextSkuNumber);
+        String suggestedSku = upperCategoryCode + formattedSkuNumber;
+        logger.info("Suggested SKU for categoryId {}: {}", categoryId, suggestedSku);
+
+        return suggestedSku;
     }
 }

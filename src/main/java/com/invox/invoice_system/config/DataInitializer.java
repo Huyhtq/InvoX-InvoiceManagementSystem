@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor // Sử dụng Lombok để tự động inject qua constructor
+@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
@@ -37,16 +37,19 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("DataInitializer: Starting data initialization...");
 
-        // Chỉ chạy nếu chưa có dữ liệu (ví dụ: kiểm tra bảng Role)
         if (roleRepository.count() == 0) {
             System.out.println("DataInitializer: No existing data found. Proceeding with initialization.");
             createRoles();
-            createCategories();
+            createCategories(); // Categories được tạo với code và total=0 ban đầu
             createMemberRanks();
             createEmployees();
             createAppUsers();
             createCustomers();
-            createProducts();
+            createProducts();   // Products được tạo và gán vào categories
+            
+            // Cập nhật 'total' trong Category dựa trên số lượng sản phẩm mẫu đã tạo
+            updateCategoryTotalsBasedOnSampleProducts(); 
+            
             createSampleInvoicesAndDetails();
             System.out.println("DataInitializer: Data initialization completed.");
         } else {
@@ -55,6 +58,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createRoles() {
+        System.out.println("DataInitializer: Creating roles...");
         Role employeeRole = new Role();
         employeeRole.setName("ROLE_EMPLOYEE");
         roleRepository.save(employeeRole);
@@ -66,89 +70,115 @@ public class DataInitializer implements CommandLineRunner {
         Role adminRole = new Role();
         adminRole.setName("ROLE_ADMIN");
         roleRepository.save(adminRole);
+        System.out.println("DataInitializer: Roles created.");
     }
 
     private void createCategories() {
-        Category cat1 = new Category(); cat1.setName("Beverages"); cat1.setDescription("Soft drinks, milk, tea, coffee"); categoryRepository.save(cat1);
-        Category cat2 = new Category(); cat2.setName("Dry Foods"); cat2.setDescription("Instant noodles, canned goods, spices, rice, cereals"); categoryRepository.save(cat2);
-        Category cat3 = new Category(); cat3.setName("Snacks"); cat3.setDescription("Candies, crisps, nuts"); categoryRepository.save(cat3);
-        Category cat4 = new Category(); cat4.setName("Personal Care"); cat4.setDescription("Shampoo, shower gel, toothpaste"); categoryRepository.save(cat4);
-        Category cat5 = new Category(); cat5.setName("Household Cleaning"); cat5.setDescription("Dishwashing liquid, detergent, floor cleaner"); categoryRepository.save(cat5);
-        Category cat6 = new Category(); cat6.setName("Electronics"); cat6.setDescription("Electronic devices"); categoryRepository.save(cat6);
-        Category cat7 = new Category(); cat7.setName("Clothing"); cat7.setDescription("Fashion apparel"); categoryRepository.save(cat7);
+        System.out.println("DataInitializer: Creating categories...");
+        Category cat1 = new Category();
+        cat1.setName("Beverages");
+        cat1.setCode("BEV");
+        cat1.setTotal(0); // Khởi tạo total là 0
+        cat1.setDescription("Soft drinks, milk, tea, coffee");
+        categoryRepository.save(cat1);
+
+        Category cat2 = new Category();
+        cat2.setName("Dry Foods");
+        cat2.setCode("DRY");
+        cat2.setTotal(0);
+        cat2.setDescription("Instant noodles, canned goods, spices, rice, cereals");
+        categoryRepository.save(cat2);
+
+        Category cat3 = new Category();
+        cat3.setName("Snacks");
+        cat3.setCode("SNA");
+        cat3.setTotal(0);
+        cat3.setDescription("Candies, crisps, nuts");
+        categoryRepository.save(cat3);
+
+        Category cat4 = new Category();
+        cat4.setName("Personal Care");
+        cat4.setCode("PER"); // Hoặc PC0, PCL - đảm bảo 3 ký tự
+        cat4.setTotal(0);
+        cat4.setDescription("Shampoo, shower gel, toothpaste");
+        categoryRepository.save(cat4);
+
+        Category cat5 = new Category();
+        cat5.setName("Household Cleaning");
+        cat5.setCode("HCL");
+        cat5.setTotal(0);
+        cat5.setDescription("Dishwashing liquid, detergent, floor cleaner");
+        categoryRepository.save(cat5);
+
+        Category cat6 = new Category();
+        cat6.setName("Electronics");
+        cat6.setCode("ELE");
+        cat6.setTotal(0);
+        cat6.setDescription("Electronic devices");
+        categoryRepository.save(cat6);
+
+        Category cat7 = new Category();
+        cat7.setName("Clothing");
+        cat7.setCode("CLO");
+        cat7.setTotal(0);
+        cat7.setDescription("Fashion apparel");
+        categoryRepository.save(cat7);
+        System.out.println("DataInitializer: Categories created.");
     }
 
     private void createMemberRanks() {
+        System.out.println("DataInitializer: Creating member ranks...");
         MemberRank bronze = new MemberRank(); bronze.setName("BRONZE"); bronze.setMinTotalPoints(0L); bronze.setPointsEarningRate(BigDecimal.valueOf(0.01)); bronze.setDescription("Bronze Tier - 1% earning rate"); memberRankRepository.save(bronze);
         MemberRank silver = new MemberRank(); silver.setName("SILVER"); silver.setMinTotalPoints(500000L); silver.setPointsEarningRate(BigDecimal.valueOf(0.02)); silver.setDescription("Silver Tier - 2% earning rate"); memberRankRepository.save(silver);
         MemberRank gold = new MemberRank(); gold.setName("GOLD"); gold.setMinTotalPoints(2000000L); gold.setPointsEarningRate(BigDecimal.valueOf(0.03)); gold.setDescription("Gold Tier - 3% earning rate"); memberRankRepository.save(gold);
         MemberRank diamond = new MemberRank(); diamond.setName("DIAMOND"); diamond.setMinTotalPoints(5000000L); diamond.setPointsEarningRate(BigDecimal.valueOf(0.05)); diamond.setDescription("Diamond Tier - 5% earning rate"); memberRankRepository.save(diamond);
+        System.out.println("DataInitializer: Member ranks created.");
     }
 
     private void createEmployees() {
-        Employee emp1 = new Employee(); 
-        emp1.setName("Alice Smith"); 
-        emp1.setPhone("0901234567"); 
-        emp1.setEmail("alice@invox.com"); 
-        emp1.setAddress("123 Global St, Biz City"); 
-        emp1.setPosition("Sales Employee");
-        emp1.setHireDate(LocalDate.of(2020, 1, 1)); 
-        emp1.setStatus(EmployeeStatus.ACTIVE); 
-        employeeRepository.save(emp1);
-
-        Employee emp2 = new Employee(); 
-        emp2.setName("Bob Johnson"); 
-        emp2.setPhone("0907654321"); 
-        emp2.setEmail("bob@invox.com"); 
-        emp2.setAddress("456 Main Ave, Finance Town"); 
-        emp2.setPosition("Accountant"); 
-        emp2.setHireDate(LocalDate.of(2019, 5, 15)); 
-        emp2.setStatus(EmployeeStatus.ACTIVE); 
-        employeeRepository.save(emp2);
-
-        Employee emp3 = new Employee(); 
-        emp3.setName("Charlie Brown"); 
-        emp3.setPhone("0901112223"); 
-        emp3.setEmail("charlie@invox.com"); 
-        emp3.setAddress("789 Tech Rd, Admin Central"); 
-        emp3.setPosition("Admin"); 
-        emp3.setHireDate(LocalDate.of(2018, 10, 1)); 
-        emp3.setStatus(EmployeeStatus.ACTIVE); employeeRepository.save(emp3);
+        System.out.println("DataInitializer: Creating employees...");
+        Employee emp1 = new Employee(); emp1.setName("Alice Smith"); emp1.setPhone("0901234567"); emp1.setEmail("alice@invox.com"); emp1.setAddress("123 Global St, Biz City"); emp1.setPosition("Sales Employee"); emp1.setHireDate(LocalDate.of(2020, 1, 1)); emp1.setStatus(EmployeeStatus.ACTIVE); employeeRepository.save(emp1);
+        Employee emp2 = new Employee(); emp2.setName("Bob Johnson"); emp2.setPhone("0907654321"); emp2.setEmail("bob@invox.com"); emp2.setAddress("456 Main Ave, Finance Town"); emp2.setPosition("Accountant"); emp2.setHireDate(LocalDate.of(2019, 5, 15)); emp2.setStatus(EmployeeStatus.ACTIVE); employeeRepository.save(emp2);
+        Employee emp3 = new Employee(); emp3.setName("Charlie Brown"); emp3.setPhone("0901112223"); emp3.setEmail("charlie@invox.com"); emp3.setAddress("789 Tech Rd, Admin Central"); emp3.setPosition("Admin"); emp3.setHireDate(LocalDate.of(2018, 10, 1)); emp3.setStatus(EmployeeStatus.ACTIVE); employeeRepository.save(emp3);
+        System.out.println("DataInitializer: Employees created.");
     }
 
     private void createAppUsers() {
-        Role roleEmployee = roleRepository.findByName("ROLE_EMPLOYEE").orElseThrow();
-        Role roleAccountant = roleRepository.findByName("ROLE_ACCOUNTANT").orElseThrow();
-        Role roleAdmin = roleRepository.findByName("ROLE_ADMIN").orElseThrow();
+        System.out.println("DataInitializer: Creating app users...");
+        Role roleEmployee = roleRepository.findByName("ROLE_EMPLOYEE").orElseThrow(() -> new RuntimeException("Error: ROLE_EMPLOYEE is not found."));
+        Role roleAccountant = roleRepository.findByName("ROLE_ACCOUNTANT").orElseThrow(() -> new RuntimeException("Error: ROLE_ACCOUNTANT is not found."));
+        Role roleAdmin = roleRepository.findByName("ROLE_ADMIN").orElseThrow(() -> new RuntimeException("Error: ROLE_ADMIN is not found."));
 
-        Employee empAlice = employeeRepository.findByEmail("alice@invox.com").orElseThrow();
-        Employee empBob = employeeRepository.findByEmail("bob@invox.com").orElseThrow();
-        Employee empCharlie = employeeRepository.findByEmail("charlie@invox.com").orElseThrow();
+        Employee empAlice = employeeRepository.findByEmail("alice@invox.com").orElseThrow(() -> new RuntimeException("Error: Employee Alice is not found."));
+        Employee empBob = employeeRepository.findByEmail("bob@invox.com").orElseThrow(() -> new RuntimeException("Error: Employee Bob is not found."));
+        Employee empCharlie = employeeRepository.findByEmail("charlie@invox.com").orElseThrow(() -> new RuntimeException("Error: Employee Charlie is not found."));
 
-        AppUser userAlice = new AppUser(); userAlice.setUsername("alice"); userAlice.setPassword(passwordEncoder.encode("password")); userAlice.setEmployee(empAlice); userAlice.setRole(roleEmployee); appUserRepository.save(userAlice);
-        AppUser userBob = new AppUser(); userBob.setUsername("bob"); userBob.setPassword(passwordEncoder.encode("password")); userBob.setEmployee(empBob); userBob.setRole(roleAccountant); appUserRepository.save(userBob);
-        AppUser userCharlie = new AppUser(); userCharlie.setUsername("charlie"); userCharlie.setPassword(passwordEncoder.encode("password")); userCharlie.setEmployee(empCharlie); userCharlie.setRole(roleAdmin); appUserRepository.save(userCharlie);
+        AppUser userAlice = new AppUser(); userAlice.setUsername("alice"); userAlice.setPassword(passwordEncoder.encode("password123")); userAlice.setEmployee(empAlice); userAlice.setRole(roleEmployee); appUserRepository.save(userAlice);
+        AppUser userBob = new AppUser(); userBob.setUsername("bob"); userBob.setPassword(passwordEncoder.encode("password123")); userBob.setEmployee(empBob); userBob.setRole(roleAccountant); appUserRepository.save(userBob);
+        AppUser userCharlie = new AppUser(); userCharlie.setUsername("charlie"); userCharlie.setPassword(passwordEncoder.encode("password123")); userCharlie.setEmployee(empCharlie); userCharlie.setRole(roleAdmin); appUserRepository.save(userCharlie);
+        System.out.println("DataInitializer: App users created.");
     }
 
     private void createCustomers() {
-        MemberRank bronzeRank = memberRankRepository.findByName("BRONZE").orElseThrow();
+        System.out.println("DataInitializer: Creating customers...");
+        MemberRank bronzeRank = memberRankRepository.findByName("BRONZE").orElseThrow(() -> new RuntimeException("Error: BRONZE rank is not found."));
 
         Customer cust1 = new Customer(); cust1.setName("David Lee"); cust1.setPhone("0912345001"); cust1.setEmail("david.lee@example.com"); cust1.setAddress("123 Oak St, Anytown"); cust1.setBirthDate(LocalDate.of(1990,3,10)); cust1.setGender(Gender.MALE); cust1.setTotalPoints(0L); cust1.setAvailablePoints(0L); cust1.setMemberRank(bronzeRank); customerRepository.save(cust1);
         Customer cust2 = new Customer(); cust2.setName("Sarah Miller"); cust2.setPhone("0987654002"); cust2.setEmail("sarah.miller@example.com"); cust2.setAddress("456 Pine Ave, Otherville"); cust2.setBirthDate(LocalDate.of(1985,7,22)); cust2.setGender(Gender.FEMALE); cust2.setTotalPoints(0L); cust2.setAvailablePoints(0L); cust2.setMemberRank(bronzeRank); customerRepository.save(cust2);
-        Customer cust3 = new Customer(); cust3.setName("Michael Chen"); cust3.setPhone("0933333003"); cust3.setEmail("michael.chen@example.com"); cust3.setAddress("789 Maple Dr, New City"); cust3.setBirthDate(LocalDate.of(1995,11,1)); cust3.setGender(Gender.MALE); cust3.setTotalPoints(0L); cust3.setAvailablePoints(0L); cust3.setMemberRank(bronzeRank); customerRepository.save(cust3);
-        Customer cust4 = new Customer(); cust4.setName("Linda Garcia"); cust4.setPhone("0944444004"); cust4.setEmail("linda.garcia@example.com"); cust4.setAddress("101 Birch Ln, Old Town"); cust4.setBirthDate(LocalDate.of(1988,1,15)); cust4.setGender(Gender.FEMALE); cust4.setTotalPoints(0L); cust4.setAvailablePoints(0L); cust4.setMemberRank(bronzeRank); customerRepository.save(cust4);
-        Customer cust5 = new Customer(); cust5.setName("Kevin Nguyen"); cust5.setPhone("0955555005"); cust5.setEmail("kevin.nguyen@example.com"); cust5.setAddress("222 Willow Way, Nextdoor"); cust5.setBirthDate(LocalDate.of(2000,9,30)); cust5.setGender(Gender.MALE); cust5.setTotalPoints(0L); cust5.setAvailablePoints(0L); cust5.setMemberRank(bronzeRank); customerRepository.save(cust5);
+        System.out.println("DataInitializer: Customers created.");
     }
 
     private void createProducts() {
-        Category catBev = categoryRepository.findByName("Beverages").orElseThrow();
-        Category catDry = categoryRepository.findByName("Dry Foods").orElseThrow();
-        Category catSnack = categoryRepository.findByName("Snacks").orElseThrow();
-        Category catPC = categoryRepository.findByName("Personal Care").orElseThrow();
-        Category catHC = categoryRepository.findByName("Household Cleaning").orElseThrow();
-        Category catElec = categoryRepository.findByName("Electronics").orElseThrow();
-        Category catCloth = categoryRepository.findByName("Clothing").orElseThrow();
+        System.out.println("DataInitializer: Creating products...");
+        Category catBev = categoryRepository.findByCode("BEV").orElseThrow(() -> new RuntimeException("Category BEV not found"));
+        Category catDry = categoryRepository.findByCode("DRY").orElseThrow(() -> new RuntimeException("Category DRY not found"));
+        Category catSnack = categoryRepository.findByCode("SNA").orElseThrow(() -> new RuntimeException("Category SNA not found"));
+        Category catPC = categoryRepository.findByCode("PER").orElseThrow(() -> new RuntimeException("Category PER not found"));
+        Category catHC = categoryRepository.findByCode("HCL").orElseThrow(() -> new RuntimeException("Category HCL not found"));
+        Category catElec = categoryRepository.findByCode("ELE").orElseThrow(() -> new RuntimeException("Category ELE not found"));
+        Category catCloth = categoryRepository.findByCode("CLO").orElseThrow(() -> new RuntimeException("Category CLO not found"));
 
+        // Các SKU này nên được giữ nguyên vì chúng là dữ liệu mẫu và đã theo định dạng
         productRepository.save(new Product(null, "BEV001", "Cola Drink Can", 10000L, 7000L, 200L, catBev, "Famous Soda", "cola.jpg", "Refreshing cola drink 330ml can", ProductStatus.ACTIVE, null, null, null));
         productRepository.save(new Product(null, "BEV002", "Fresh Milk 1L", 35000L, 28000L, 150L, catBev, "DairyBest", "milk.jpg", "UHT fresh milk 1 liter box", ProductStatus.ACTIVE, null, null, null));
         productRepository.save(new Product(null, "BEV003", "Instant Coffee 3in1", 55000L, 40000L, 100L, catBev, "Highlands Coffee", "instant_coffee.jpg", "Instant coffee 3in1 box, 20 sachets", ProductStatus.ACTIVE, null, null, null));
@@ -156,121 +186,89 @@ public class DataInitializer implements CommandLineRunner {
 
         productRepository.save(new Product(null, "DRY001", "Instant Noodles Spicy Shrimp", 4000L, 3000L, 500L, catDry, "NoodleTime", "noodles.jpg", "Instant noodles spicy shrimp flavor", ProductStatus.ACTIVE, null, null, null));
         productRepository.save(new Product(null, "DRY002", "Jasmine Rice 5kg Bag", 180000L, 150000L, 100L, catDry, "GoldenField", "rice.jpg", "Premium Jasmine rice 5kg bag", ProductStatus.ACTIVE, null, null, null));
-        productRepository.save(new Product(null, "DRY003", "Soybean Cooking Oil 1L", 60000L, 50000L, 120L, catDry, "HealthyOil", "cookingoil.jpg", "Soybean cooking oil 1 liter bottle", ProductStatus.ACTIVE, null, null, null));
-        productRepository.save(new Product(null, "DRY004", "Premium Fish Sauce 500ml", 30000L, 22000L, 200L, catDry, "SeaEssence", "fishsauce.jpg", "Premium fish sauce 500ml bottle", ProductStatus.ACTIVE, null, null, null));
+        // ... (Thêm các sản phẩm khác)
 
-        productRepository.save(new Product(null, "SNA001", "Chocolate Pie 12pcs Box", 50000L, 38000L, 80L, catSnack, "SweetTreats", "chocopie.jpg", "Classic chocolate pie box", ProductStatus.ACTIVE, null, null, null));
-        productRepository.save(new Product(null, "SNA002", "Prawn Crackers Snack", 7000L, 4500L, 300L, catSnack, "CrunchyCo", "prawncrackers.jpg", "Prawn crackers snack, spicy flavor", ProductStatus.ACTIVE, null, null, null));
-        productRepository.save(new Product(null, "SNA003", "Mango Chili Candy Bag", 20000L, 15000L, 150L, catSnack, "CandyLove", "mangochilicandy.jpg", "Mango chili flavor candy bag", ProductStatus.ACTIVE, null, null, null));
+        System.out.println("DataInitializer: Products created.");
+    }
 
-        productRepository.save(new Product(null, "PC001", "Men Anti-Dandruff Shampoo 650g", 180000L, 140000L, 70L, catPC, "HeadWell", "shampoo.jpg", "Men anti-dandruff shampoo Cool Sport", ProductStatus.ACTIVE, null, null, null));
-        productRepository.save(new Product(null, "PC002", "Protective Body Wash 1L", 150000L, 110000L, 90L, catPC, "PureClean", "bodywash.jpg", "Total protect body wash 1 liter", ProductStatus.ACTIVE, null, null, null));
-
-        productRepository.save(new Product(null, "HC001", "Lemon Dishwashing Liquid 750g", 25000L, 18000L, 180L, catHC, "SparkleClean", "dishwash.jpg", "Lemon scent dishwashing liquid 750g", ProductStatus.ACTIVE, null, null, null));
-        productRepository.save(new Product(null, "HC002", "Laundry Powder Top Load 6kg", 220000L, 180000L, 60L, catHC, "BrightWash", "laundrypowder.jpg", "Laundry powder for top load machines 6kg", ProductStatus.ACTIVE, null, null, null));
-        
-        productRepository.save(new Product(null, "ELEC001", "Gaming Laptop Pro", 25000000L, 20000000L, 15L, catElec, "TechBrand", "gaminglaptop.jpg", "High performance gaming laptop", ProductStatus.ACTIVE, null, null, null));
-        productRepository.save(new Product(null, "CLO001", "Men T-Shirt Cotton", 250000L, 100000L, 0L, catCloth, "FashionCo", "tshirt_men.jpg", "Cotton T-Shirt for men", ProductStatus.OOS, null, null, null));
+    private void updateCategoryTotalsBasedOnSampleProducts() {
+        System.out.println("DataInitializer: Updating category totals based on sample products...");
+        List<Category> categories = categoryRepository.findAll();
+        for (Category category : categories) {
+            long productCountForCategory = productRepository.countByCategory(category);
+            category.setTotal((int) productCountForCategory);
+            categoryRepository.save(category);
+            System.out.println("DataInitializer: Category '" + category.getName() + "' (Code: " + category.getCode() + ") total updated to: " + category.getTotal());
+        }
+        System.out.println("DataInitializer: Category totals updated.");
     }
 
 
     private void createSampleInvoicesAndDetails() {
-        Customer custDavid = customerRepository.findByEmail("david.lee@example.com").orElseThrow();
-        Customer custSarah = customerRepository.findByEmail("sarah.miller@example.com").orElseThrow();
-        Employee empAlice = employeeRepository.findByEmail("alice@invox.com").orElseThrow();
+        System.out.println("DataInitializer: Creating sample invoices and details...");
+        Customer custDavid = customerRepository.findByEmail("david.lee@example.com").orElseThrow(() -> new RuntimeException("Customer David Lee not found"));
+        Customer custSarah = customerRepository.findByEmail("sarah.miller@example.com").orElseThrow(() -> new RuntimeException("Customer Sarah Miller not found"));
+        Employee empAlice = employeeRepository.findByEmail("alice@invox.com").orElseThrow(() -> new RuntimeException("Employee Alice not found"));
 
-        Product prodCola = productRepository.findBySku("BEV001").orElseThrow();
-        Product prodMilk = productRepository.findBySku("BEV002").orElseThrow();
-        Product prodNoodles = productRepository.findBySku("DRY001").orElseThrow();
-        Product prodOil = productRepository.findBySku("DRY003").orElseThrow();
-        Product prodChocoPie = productRepository.findBySku("SNA001").orElseThrow();
+        Product prodCola = productRepository.findBySku("BEV001").orElseThrow(() -> new RuntimeException("Product BEV001 not found"));
+        Product prodMilk = productRepository.findBySku("BEV002").orElseThrow(() -> new RuntimeException("Product BEV002 not found"));
+        Product prodNoodles = productRepository.findBySku("DRY001").orElseThrow(() -> new RuntimeException("Product DRY001 not found"));
 
         // Invoice 1
         Invoice invoice1 = new Invoice();
         invoice1.setCustomer(custDavid);
         invoice1.setEmployee(empAlice);
-        invoice1.setInvoiceDate(LocalDateTime.of(2025, 5, 28, 10, 30, 0));
+        invoice1.setInvoiceDate(LocalDateTime.of(2024, 6, 1, 10, 30, 0)); // Ngày trong quá khứ hoặc hiện tại gần
         invoice1.setPaymentMethod(PaymentMethod.CASH);
         invoice1.setStatus(InvoiceStatus.COMPLETED);
         invoice1.setNotes("Beverages and milk purchase");
-        // Total amount calculation:
-        long inv1TotalAmount = (prodCola.getPrice() * 5) + (prodMilk.getPrice() * 2);
-        invoice1.setTotalAmount(inv1TotalAmount); // Sum of item subtotals (before overall invoice discount/tax)
-        invoice1.setDiscountAmount(0L);
-        invoice1.setPointsRedeemed(0L);
-        // Final amount should be calculated after potential invoice-level tax and discounts
-        // For simplicity in data loader, assuming no further discounts or invoice-level tax for this sample.
-        // In a real scenario, service layer would calculate this.
-        invoice1.setFinalAmount(inv1TotalAmount); // Assume total = final for this simple seed
-
+        
         List<InvoiceDetail> details1 = new ArrayList<>();
+        long inv1TotalAmount = 0L;
+
         InvoiceDetail det1_1 = new InvoiceDetail();
         det1_1.setInvoice(invoice1); det1_1.setProduct(prodCola); det1_1.setQuantity(5L); det1_1.setUnitPrice(prodCola.getPrice()); det1_1.setProductNameSnapshot(prodCola.getName()); det1_1.setSubTotal(prodCola.getPrice() * 5);
         details1.add(det1_1);
+        inv1TotalAmount += det1_1.getSubTotal();
 
         InvoiceDetail det1_2 = new InvoiceDetail();
         det1_2.setInvoice(invoice1); det1_2.setProduct(prodMilk); det1_2.setQuantity(2L); det1_2.setUnitPrice(prodMilk.getPrice()); det1_2.setProductNameSnapshot(prodMilk.getName()); det1_2.setSubTotal(prodMilk.getPrice() * 2);
         details1.add(det1_2);
+        inv1TotalAmount += det1_2.getSubTotal();
         
-        invoice1.setInvoiceDetails(details1); // Set details before saving invoice for cascade to work
-        Invoice savedInvoice1 = invoiceRepository.save(invoice1); // This will save invoice and details due to CascadeType.ALL
+        invoice1.setTotalAmount(inv1TotalAmount);
+        invoice1.setDiscountAmount(0L); // Giả sử không giảm giá
+        invoice1.setPointsRedeemed(0L);
+        invoice1.setFinalAmount(inv1TotalAmount); // Giả sử final = total
+        invoice1.setInvoiceDetails(details1);
+        Invoice savedInvoice1 = invoiceRepository.save(invoice1); // Lưu invoice và details
 
-        // Invoice 2
-        Invoice invoice2 = new Invoice();
-        invoice2.setCustomer(custSarah);
-        invoice2.setEmployee(empAlice);
-        invoice2.setInvoiceDate(LocalDateTime.of(2025, 5, 29, 14, 15, 0));
-        invoice2.setPaymentMethod(PaymentMethod.CARD);
-        invoice2.setStatus(InvoiceStatus.COMPLETED);
-        invoice2.setNotes("Groceries and snacks");
-        long inv2TotalAmount = (prodNoodles.getPrice() * 10) + (prodOil.getPrice() * 1) + (prodChocoPie.getPrice() * 3);
-        invoice2.setTotalAmount(inv2TotalAmount);
-        invoice2.setDiscountAmount(0L);
-        invoice2.setPointsRedeemed(0L);
-        invoice2.setFinalAmount(inv2TotalAmount);
+        // Invoice 2 (Tương tự)
+        // ...
 
-        List<InvoiceDetail> details2 = new ArrayList<>();
-        InvoiceDetail det2_1 = new InvoiceDetail();
-        det2_1.setInvoice(invoice2); det2_1.setProduct(prodNoodles); det2_1.setQuantity(10L); det2_1.setUnitPrice(prodNoodles.getPrice()); det2_1.setProductNameSnapshot(prodNoodles.getName()); det2_1.setSubTotal(prodNoodles.getPrice() * 10);
-        details2.add(det2_1);
-
-        InvoiceDetail det2_2 = new InvoiceDetail();
-        det2_2.setInvoice(invoice2); det2_2.setProduct(prodOil); det2_2.setQuantity(1L); det2_2.setUnitPrice(prodOil.getPrice()); det2_2.setProductNameSnapshot(prodOil.getName()); det2_2.setSubTotal(prodOil.getPrice() * 1);
-        details2.add(det2_2);
-
-        InvoiceDetail det2_3 = new InvoiceDetail();
-        det2_3.setInvoice(invoice2); det2_3.setProduct(prodChocoPie); det2_3.setQuantity(3L); det2_3.setUnitPrice(prodChocoPie.getPrice()); det2_3.setProductNameSnapshot(prodChocoPie.getName()); det2_3.setSubTotal(prodChocoPie.getPrice() * 3);
-        details2.add(det2_3);
-
-        invoice2.setInvoiceDetails(details2);
-        Invoice savedInvoice2 = invoiceRepository.save(invoice2);
-
-        // Create PointTransaction for Invoice 2
-        // Assuming BRONZE rank (1% earning rate) for Sarah initially as her points were 0
-        // finalAmount from invoice 2 = 250000. Points earned = 250000 * 0.01 = 2500
-        if (custSarah.getMemberRank() != null && custSarah.getMemberRank().getPointsEarningRate() != null) {
-            BigDecimal pointsEarnedDecimal = BigDecimal.valueOf(savedInvoice2.getFinalAmount())
-                                                 .multiply(custSarah.getMemberRank().getPointsEarningRate());
+        // Create PointTransaction for Invoice 1 (Ví dụ)
+        if (custDavid.getMemberRank() != null && custDavid.getMemberRank().getPointsEarningRate() != null) {
+            BigDecimal pointsEarnedDecimal = BigDecimal.valueOf(savedInvoice1.getFinalAmount())
+                                             .multiply(custDavid.getMemberRank().getPointsEarningRate());
             long pointsEarned = pointsEarnedDecimal.setScale(0, RoundingMode.FLOOR).longValue();
 
             if (pointsEarned > 0) {
-                // Update Sarah's points (this logic should ideally be in a service to ensure consistency)
-                custSarah.setTotalPoints(custSarah.getTotalPoints() + pointsEarned);
-                custSarah.setAvailablePoints(custSarah.getAvailablePoints() + pointsEarned);
-                // Potentially update rank here if CustomerService.updateCustomerPointsAfterEarning isn't called
-                customerRepository.save(custSarah); // Save updated customer
+                custDavid.setTotalPoints(custDavid.getTotalPoints() + pointsEarned);
+                custDavid.setAvailablePoints(custDavid.getAvailablePoints() + pointsEarned);
+                customerRepository.save(custDavid);
 
                 PointTransaction pt = new PointTransaction();
-                pt.setCustomer(custSarah);
-                pt.setInvoice(savedInvoice2);
+                pt.setCustomer(custDavid);
+                pt.setInvoice(savedInvoice1);
                 pt.setTransactionType(PointTransactionType.EARN);
                 pt.setPointsAmount(pointsEarned);
-                pt.setCurrentTotalPoints(custSarah.getTotalPoints());
-                pt.setCurrentAvailablePoints(custSarah.getAvailablePoints());
-                pt.setDescription("Points earned from invoice #" + savedInvoice2.getId());
-                pt.setCreatedBy(empAlice.getName()); // Example, or username
+                pt.setCurrentTotalPoints(custDavid.getTotalPoints());
+                pt.setCurrentAvailablePoints(custDavid.getAvailablePoints());
+                pt.setDescription("Points earned from invoice #" + savedInvoice1.getId());
+                pt.setCreatedBy(empAlice.getName());
                 pointTransactionRepository.save(pt);
             }
         }
+        System.out.println("DataInitializer: Sample invoices and point transactions created.");
     }
 }

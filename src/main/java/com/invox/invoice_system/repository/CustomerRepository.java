@@ -23,4 +23,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findByTotalPointsGreaterThanEqual(Long totalPoints);
 
     List<Customer> findByNameContainingIgnoreCaseOrPhoneContaining(String name, String phone);
+    
+    List<Customer> findTop10ByNameContainingIgnoreCaseOrPhoneContaining(String name, String phone);
 }

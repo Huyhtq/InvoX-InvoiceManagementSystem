@@ -1,6 +1,8 @@
 package com.invox.invoice_system.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -25,6 +27,13 @@ public class Category {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    @NotBlank(message = "Mã danh mục không được để trống")
+    @Size(min = 3, max = 3, message = "Mã danh mục phải có đúng 3 ký tự")
+    @Column(length = 3, nullable = false, unique = true)
+    private String code;
+
+    private Integer total; // tổng số mặt hàng loại đó được đánh số 
+    
     @Column(name = "description", length = 255)
     private String description;
 

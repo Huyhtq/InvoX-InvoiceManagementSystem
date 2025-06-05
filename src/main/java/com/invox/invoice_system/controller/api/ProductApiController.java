@@ -5,6 +5,8 @@ import com.invox.invoice_system.dto.ProductResponseDTO;
 import com.invox.invoice_system.enums.ProductStatus;
 import com.invox.invoice_system.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.List;
 public class ProductApiController {
 
     private final ProductService productService;
+    private static final Logger logger = LoggerFactory.getLogger(ProductApiController.class);
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts(
@@ -55,5 +58,21 @@ public class ProductApiController {
     public ResponseEntity<?> updateProductQuantity(@PathVariable Long id, @RequestParam Long quantityChange) {
         ProductResponseDTO updatedProduct = productService.updateProductQuantity(id, quantityChange);
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
+    }
+
+    @GetMapping("/suggest-sku")
+    public ResponseEntity<String> getSuggestedSku(@RequestParam("categoryId") Long categoryId) {
+        try {
+            logger.info("API: Received request to suggest SKU for categoryId: {}", categoryId);
+            String suggestedSku = productService.suggestSkuForCategory(categoryId);
+            logger.info("API: Suggested SKU for categoryId {}: {}", categoryId, suggestedSku);
+            return ResponseEntity.ok(suggestedSku);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            logger.warn("API: Bad request for SKU suggestion (categoryId {}): {}", categoryId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("API: Internal server error suggesting SKU for categoryId {}: {}", categoryId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi hệ thống khi tạo SKU.");
+        }
     }
 }

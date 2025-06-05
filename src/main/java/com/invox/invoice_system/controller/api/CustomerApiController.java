@@ -47,4 +47,10 @@ public class CustomerApiController {
         customerService.deleteCustomer(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/search") // Ví dụ: /api/customers/search?term=david
+    public ResponseEntity<List<CustomerResponseDTO>> searchCustomers(@RequestParam("term") String searchTerm) {
+        List<CustomerResponseDTO> customers = customerService.searchCustomersByNameOrPhone(searchTerm);
+        return ResponseEntity.ok(customers);
+    }
 }

@@ -18,4 +18,5 @@ public interface CustomerService {
     List<CustomerResponseDTO> searchCustomersByTerm(String searchTerm);
     CustomerResponseDTO redeemPointsFromCustomer(Long customerId, Long pointsToRedeem, Invoice invoice);
     void updateCustomerPointsAfterEarning(Long customerId, Long pointsEarned);
+    List<CustomerResponseDTO> searchCustomersByNameOrPhone(String searchTerm);
 }

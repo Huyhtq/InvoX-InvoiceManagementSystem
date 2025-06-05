@@ -1,6 +1,7 @@
 package com.invox.invoice_system.repository;
 
 import com.invox.invoice_system.entity.Product;
+import com.invox.invoice_system.entity.Category;
 import com.invox.invoice_system.enums.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -33,4 +34,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySku(String sku); 
 
     List<Product> findByNameContainingIgnoreCaseOrSkuContainingIgnoreCase(String nameTerm, String skuTerm);
+
+    Integer countByCategoryId(Long id);
+
+    long countByCategory(Category category);
 }

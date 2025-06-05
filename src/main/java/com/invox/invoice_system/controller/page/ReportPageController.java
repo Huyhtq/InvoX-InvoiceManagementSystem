@@ -42,7 +42,7 @@ public class ReportPageController {
         ByteArrayInputStream bis = excelExportService.exportFinancialReportToExcel(reportData);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=BaoCaoTaiChinh.xlsx");
+        headers.add("Content-Disposition", "attachment; filename=Finacial_Report.xlsx");
 
         return ResponseEntity
                 .ok()
@@ -61,7 +61,7 @@ public class ReportPageController {
         ByteArrayInputStream bis = pdfExportService.exportFinancialReportToPdf(reportData);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename=BaoCaoTaiChinh.pdf"); // inline để mở trong trình duyệt, attachment để tải về
+        headers.add("Content-Disposition", "inline; filename=Finacial_Report.pdf"); // inline để mở trong trình duyệt, attachment để tải về
 
         return ResponseEntity
                 .ok()
@@ -116,7 +116,7 @@ public class ReportPageController {
         }
 
         model.addAttribute("reportData", reportData);
-        model.addAttribute("pageTitle", "Báo cáo Tài chính");
+        model.addAttribute("pageTitle", "Finacial Report");
         // Truyền lại các tham số filter để hiển thị trên form
         model.addAttribute("selectedPeriod", period);
         model.addAttribute("selectedStartDate", startDate);

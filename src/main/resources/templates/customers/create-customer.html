@@ -6,7 +6,7 @@
         <div class="row mb-4">
           <div class="col-12">
             <h2
-              th:text="${customer.id != null} ? 'Edit Customer' : 'Add New Customer'"
+              th:text="${customer.id != null} ? 'Edit Customer Information' : 'Add New Customer'"
             >
               Add New Customer
             </h2>
@@ -29,8 +29,6 @@
             th:object="${customer}"
             method="post"
           >
-            <input type="hidden" th:field="*{id}" />
-
             <div class="mb-3">
               <label for="nameInput" class="form-label">Customer Name</label>
               <input

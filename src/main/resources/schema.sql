@@ -26,7 +26,9 @@ DROP SEQUENCE History_SEQ;
 -- Create table Category
 CREATE TABLE Category (
     id NUMBER(3, 0) PRIMARY KEY,
-    name VARCHAR2(50) NOT NULL UNIQUE, -- Tăng kích thước và thêm UNIQUE
+    name VARCHAR2(50) NOT NULL UNIQUE,
+    code VARCHAR2(3) NOT NULL UNIQUE,
+    total NUMBER(3,0) DEFAULT 0,
     description VARCHAR2(255)
 );
 
