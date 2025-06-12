@@ -1,0 +1,39 @@
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Source Sans 3", sans-serif;
+  background-color: #F4F4F4;
+  overflow-x: hidden; 
+  color: #989898;    
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--dark-color);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Global image filter*/
+img {
+  filter: grayscale(100%) brightness(0.6) invert(0.8); 
+}
+
+
+/* Iconify Styles */
+iconify-icon {
+  vertical-align: middle; /* Căn giữa icon tốt hơn */
+  /* vertical-align: top; */
+}
