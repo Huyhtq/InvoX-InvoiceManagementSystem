@@ -74,12 +74,15 @@ public class ProductPageController {
         Optional<ProductResponseDTO> productOptional = productService.getProductById(id);
         if (productOptional.isPresent()) {
             ProductResponseDTO productResponseDTO = productOptional.get();
-            
-            // Ánh xạ ProductResponseDTO sang ProductRequestDTO để đổ vào form
-            // ProductRequestDTO của bạn đã có trường 'id'
             ProductRequestDTO productRequestDTO = new ProductRequestDTO();
-            productRequestDTO.setId(productResponseDTO.getId()); // Gán ID
+
+            // Gán đầy đủ các giá trị
+            productRequestDTO.setId(productResponseDTO.getId());
             productRequestDTO.setName(productResponseDTO.getName());
+
+            // === THÊM DÒNG NÀY VÀO ===
+            productRequestDTO.setSku(productResponseDTO.getSku());
+            
             productRequestDTO.setPrice(productResponseDTO.getPrice());
             productRequestDTO.setCostPrice(productResponseDTO.getCostPrice());
             productRequestDTO.setQuantity(productResponseDTO.getQuantity());
@@ -89,12 +92,12 @@ public class ProductPageController {
             productRequestDTO.setStatus(productResponseDTO.getStatus());
             productRequestDTO.setCategoryId(productResponseDTO.getCategory() != null ? productResponseDTO.getCategory().getId() : null);
 
-            model.addAttribute("product", productRequestDTO); // <-- product.id sẽ KHÔNG null
-            model.addAttribute("categories", categoryService.getAllCategories()); // Cần danh sách danh mục
-            model.addAttribute("productStatuses", ProductStatus.values()); // Cần các trạng thái
-            return "products/create-product"; // Hoặc "products/create-product" nếu muốn dùng chung tên view
+            model.addAttribute("product", productRequestDTO);
+            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("productStatuses", ProductStatus.values());
+            return "products/create-product";
         }
-        return "redirect:/products"; // Chuyển hướng nếu không tìm thấy sản phẩm
+        return "redirect:/products";
     }
 
     @PostMapping("/edit/{id}")

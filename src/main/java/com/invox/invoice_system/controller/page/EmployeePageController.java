@@ -55,8 +55,12 @@ public class EmployeePageController {
         Optional<EmployeeResponseDTO> employeeOptional = employeeService.getEmployeeById(id);
         if (employeeOptional.isPresent()) {
             EmployeeResponseDTO employeeResponseDTO = employeeOptional.get();
-            // Chuyển từ ResponseDTO sang RequestDTO
             EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO();
+
+            // === DÒNG SỬA QUAN TRỌNG NHẤT ===
+            employeeRequestDTO.setId(employeeResponseDTO.getId()); // <-- GÁN ID TẠI ĐÂY
+
+            // Sao chép các thuộc tính khác như cũ
             employeeRequestDTO.setName(employeeResponseDTO.getName());
             employeeRequestDTO.setPhone(employeeResponseDTO.getPhone());
             employeeRequestDTO.setEmail(employeeResponseDTO.getEmail());
@@ -68,7 +72,7 @@ public class EmployeePageController {
 
             model.addAttribute("employee", employeeRequestDTO);
             model.addAttribute("employeeStatuses", EmployeeStatus.values());
-            return "employees/create-employee";
+            return "employees/create-employee"; // Tên file template của bạn có thể khác
         }
         return "redirect:/employees";
     }
